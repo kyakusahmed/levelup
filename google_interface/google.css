@@ -177,18 +177,43 @@ text-decoration: underline;
 float: right;
 }
 
-@media screen and (max-width: 800px) {
-    
-    .search-form{
-        margin: auto;
+@media screen and (max-width: 1200px) {
+  
+  .google  {
+    text-align: center;
+    display: block;
+    margin: -20px auto 0 auto ;
+    padding: 80px 0;
+    clear: both;
+    font-size: 70px;
     }
-}
 
-@media screen and (max-width: 400px) {
+    .search-form{
+      margin: auto; 
+  }
+  
+  .search-form {
+    width: 80%;
+    padding: 10px;
+  
+  }  
+
+  }
+
+@media screen and (max-width: 360px) {
 
 li.nav-links a {
   float: list-style;
 }
+
+.google  {
+  text-align: center;
+  display: block;
+  margin: -20px auto 0 auto ;
+  padding: 80px 0;
+  clear: both;
+  font-size: 50px;
+  }
 
 .buttons {
   display: block;
@@ -233,6 +258,16 @@ footer ul {
 li.nav-links a {
   display: none;
 }
+
+.google  {
+  text-align: center;
+  display: block;
+  margin: -20px auto 0 auto ;
+  padding: 80px 0;
+  clear: both;
+  font-size: 60px;
+  }
+
 
 
 .buttons {

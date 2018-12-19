@@ -4,7 +4,7 @@ from datetime import datetime
 class DatabaseConnection:
  
     def __init__(self):
-        self.db = ''
+        self.db = ' '
 
         try:
             self.conn = psycopg2.connect(
@@ -129,6 +129,22 @@ class Migration(DatabaseConnection):
         self.cursor.execute(command)
         print("simcard deleted") 
 
+    def add_occupation_column_to_humans(self):
+        command = """
+        ALTER TABLE humans
+        ADD occupation varchar(55)
+        """
+        self.cursor.execute(command)
+        print('column added')
+
+    def add_village_column_to_humans(self):
+        command = """
+        ALTER TABLE humans
+        ADD village varchar(55)
+        """
+        self.cursor.execute(command)
+        print('column added')   
+
     
 
 db_conn = Migration()
@@ -145,6 +161,9 @@ db_conn.add_simcard('ahmad','0782-192-133', 23401233,'vodafone', 123456)
 db_conn.get_simcard(1)
 db_conn.simcard_update(1, '0987654367')
 db_conn.get_simcard(1)
+db_conn.add_occupation_column_to_humans()
+db_conn.add_village_column_to_humans()
+db_conn.change_data_type( )
 
 db_conn.delete_simcard(1)
 db_conn.delete_human(1)

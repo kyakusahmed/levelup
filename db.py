@@ -4,11 +4,11 @@ from datetime import datetime
 class DatabaseConnection:
  
     def __init__(self):
-        self.db = ' '
+        self.db = 'ahmad'
 
         try:
             self.conn = psycopg2.connect(
-            database=self.db, user="", password="", port="5432", host=""
+            database=self.db, user="postgres", password="1988", port="5432", host="127.0.0.1"
             )
             self.conn.autocommit = True
             self.cursor = self.conn.cursor()
@@ -147,6 +147,8 @@ class Migration(DatabaseConnection):
 
     
 
+    
+
 db_conn = Migration()
 db_conn.create_tables() 
 db_conn.drop_tables()
@@ -163,10 +165,10 @@ db_conn.simcard_update(1, '0987654367')
 db_conn.get_simcard(1)
 db_conn.add_occupation_column_to_humans()
 db_conn.add_village_column_to_humans()
-db_conn.change_data_type( )
 
-db_conn.delete_simcard(1)
-db_conn.delete_human(1)
+
+# db_conn.delete_simcard(1)
+# db_conn.delete_human(1)
 
 
 

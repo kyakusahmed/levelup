@@ -1,8 +1,8 @@
 from .import user_register, admin_register, admin_login, user_login
-from app.models.migration import Migration
 from app import app
 import unittest
 import json
+from app.models.migration import Migration
 
 
 class BaseTest(unittest.TestCase):

@@ -81,8 +81,8 @@ def edit_intervention(incident_id):
         return validate_status
     else:
         Incid = interven.update_intervention_comment(incident_id, input["comment"]) 
-        list = [{"incident_id": incident_id, "intervention": Incid}]
-        return jsonify({"status": 200, "data" : list}), 200
+        list = [{"incident_id": incident_id, "message": Incid}]
+        return jsonify({"status": 200, "redflag" : list}), 200
 
 
 @app.route('/api/v1/interventions/<int:incident_id>/inter_location', methods=['PATCH'])

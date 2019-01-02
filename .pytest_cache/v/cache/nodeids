@@ -6,9 +6,16 @@
   "tests/test_auth.py::UserTest::test_user_not_registered",
   "tests/test_auth.py::UserTest::test_user_register",
   "tests/test_auth.py::UserTest::test_user_register_email_exist",
+  "tests/test_interventions.py::InterventionsTest::test_add_intervention",
+  "tests/test_interventions.py::InterventionsTest::test_add_intervention_with_out_token",
+  "tests/test_interventions.py::InterventionsTest::test_add_inyervention_redflag_id_doesnot_exist",
+  "tests/test_interventions.py::InterventionsTest::test_comment_is_missing",
+  "tests/test_interventions.py::InterventionsTest::test_edit_comment",
   "tests/test_redflag.py::IncidentTest::test_add_incident",
   "tests/test_redflag.py::IncidentTest::test_add_incident_with_out_token",
-  "tests/test_redflag.py::IncidentTest::test_admin_updates_redflag_status",
+  "tests/test_redflag.py::IncidentTest::test_admin_update_redflag_status",
+  "tests/test_redflag.py::IncidentTest::test_admin_update_redflag_status_not_found",
+  "tests/test_redflag.py::IncidentTest::test_admin_updates_redflag_status_without_token",
   "tests/test_redflag.py::IncidentTest::test_delete_redflag",
   "tests/test_redflag.py::IncidentTest::test_delete_redflag_not_found",
   "tests/test_redflag.py::IncidentTest::test_description_is_missing",
@@ -20,5 +27,6 @@
   "tests/test_redflag.py::IncidentTest::test_get_redflags_with_user_token",
   "tests/test_redflag.py::IncidentTest::test_get_specific_redflag",
   "tests/test_redflag.py::IncidentTest::test_get_specific_redflag_not_found",
-  "tests/test_redflag.py::IncidentTest::test_get_specific_redflag_without_token"
+  "tests/test_redflag.py::IncidentTest::test_get_specific_redflag_without_token",
+  "tests/test_redflag.py::IncidentTest::test_update_location"
 ]

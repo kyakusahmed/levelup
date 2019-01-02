@@ -1,7 +1,5 @@
 {
-  "tests/test_redflag.py::IncidentTest::test_admin_updates_redflag_status": true,
-  "tests/test_redflag.py::IncidentTest::test_delete_redflag": true,
-  "tests/test_redflag.py::IncidentTest::test_edit_description": true,
+  "tests/test_interventions.py::InterventionsTest::test_add_inyervention_without_redflag_id": true,
   "tests/test_redflag.py::IncidentTest::test_get_all_redflag": true,
   "tests/test_redflag.py::IncidentTest::test_get_all_redflags": true,
   "tests/test_redflag.py::IncidentTest::test_get_redflags": true

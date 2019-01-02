@@ -6,13 +6,13 @@ user_register = {
     "isAdmin": False
 }
 
-admin_register = {
-    "first_name": "ahmad",
-    "last_name": "kyakus",
-    "email": "kyakusahmed@gmail.com",
-    "password": "ch1988",
-    "isAdmin": True
-}
+# admin_register = {
+#     "first_name": "ahmad",
+#     "last_name": "kyakus",
+#     "email": "kyakuluahmed@gmail.com",
+#     "password": "ch1988",
+#     "isAdmin": True
+# }
 
 user_login = {
     "email": "kyakusahmed@outlook.com",
@@ -20,7 +20,7 @@ user_login = {
 }
 
 admin_login = {
-    "email": "kyakusahmed@gmail.com",
+    "email": "kyakuluahmed@gmail.com",
     "password": "ch1988"
 }
 

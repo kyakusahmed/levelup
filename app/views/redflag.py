@@ -4,8 +4,9 @@ from app.models.redflag import Incident
 from app.views.validator import Validation
 from app import app
 from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity,jwt_optional)
-from flask_mail import Message, Mail
+# from flask_mail import Message, Mail
 import os
+
 
 
 incident = Incident()
@@ -160,8 +161,8 @@ def delete_redflag(incident_id):
             return validate_status
 
         incid = incident.delete_redflag(incident_id)
-        list = [{"incident_id": incident_id, "redflag": incid}] 
-        return jsonify({"status": 200, "message": list})
+        list = [{"incident_id": incident_id, "message": incid}] 
+        return jsonify({"status": 200, "redflag": list})
 
 
 @app.route('/api/v1/incidents/<int:incident_id>/status', methods=['PATCH'])
@@ -186,31 +187,32 @@ def admin_updates_redflag_status(incident_id):
         return validate_status 
 
     status_updated = incident.update_status(incident_id, input['status'])
-    list = [{"incident_id": redflag[0], "redflag": status_updated}]  
-    return jsonify({"status": 200, "message": list})
+    list = [{"incident_id": redflag[0], "message": status_updated}]  
+    return jsonify({"status": 200, "redflag": list})
 
 
-@app.route('/')
-def sendemail(email, subject, body):
-    '''send email to a user'''
-    app.config.update(
-        DEBUG=True,
-        # EMAIL SETTINGS
-        MAIL_SERVER='smtp.gmail.com',
-        MAIL_PORT=465,
-        MAIL_USE_SSL=True,
-        MAIL_USERNAME=os.environ.get('EMAIL'),
-        MAIL_PASSWORD=os.environ.get('PASS')
+# @app.route('/')
+# def sendemail(email, subject, body):
+#     '''send email to a user'''
+#     app.config.update(
+#         DEBUG=True,
+#         # EMAIL SETTINGS
+#         MAIL_SERVER='smtp.gmail.com',
+#         MAIL_PORT=465,
+#         MAIL_USE_SSL=True,
+#         MAIL_USERNAME=os.environ.get('EMAIL'),
+#         MAIL_PASSWORD=os.environ.get('PASS')
 
-    )
-    mail = Mail(app)
-    try:
-        message = Message(subject, sender="crycetruly@gmail.com", recipients=[email])
-        message.body = body
-        mail.send(message)
-        return 'mail sent'
-    except Exception as identifier:
-        pass
+#     )
+
+#     mail = Mail(app)
+#     try:
+#         message = Message(subject, sender="crycetruly@gmail.com", recipients=[email])
+#         message.body = body
+#         mail.send(message)
+#         return 'mail sent'
+#     except Exception as identifier:
+#         pass
 
 
 
@@ -236,8 +238,8 @@ def update_location(incident_id):
     
     input = request.get_json()
     location_update = incident.update_location(incident_id, input['location'])
-    list = [{"incident_id": redflag[0], "redflag": location_update}]  
-    return jsonify({"status": 200, "message": list})
+    list = [{"incident_id": redflag[0], "message": location_update}]  
+    return jsonify({"status": 200, "redflag": list}), 200
 
      
        

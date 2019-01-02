@@ -81,13 +81,13 @@ class Incident(DatabaseConnection):
         return "isAdmin updated"
 
 
-    def add_user(self, user):
-        try:
-            command = """INSERT INTO Users (first_name, last_name , email, password, createdon)
-                        VALUES (DEFAULT, %s, %s, %s, %s, %s) RETURNING first_name, last_name , email, password, datetime.now();
-                        """
-            self.cursor.execute(command)
-            user = self.cursor.fetchone()
-            return user
-        except Exception as ex:
-            return "failed {}".format(ex)
+    # def add_user(self, user):
+    #     try:
+    #         command = """INSERT INTO Users (first_name, last_name , email, password, createdon)
+    #                     VALUES (DEFAULT, %s, %s, %s, %s, %s) RETURNING first_name, last_name , email, password, datetime.now();
+    #                     """
+    #         self.cursor.execute(command)
+    #         user = self.cursor.fetchone()
+    #         return user
+    #     except Exception as ex:
+    #         return "failed {}".format(ex)

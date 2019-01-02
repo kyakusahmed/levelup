@@ -78,7 +78,7 @@ class IncidentTest(BaseTest):
         self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_Test)
         response = self.app.get('/api/v1/incidents/1', headers={"Authorization": "Bearer " + token})
         data = json.loads(response.get_data(as_text=True))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
         # self.assertIsInstance(data['redflag'], dict)
             
 
@@ -138,11 +138,28 @@ class IncidentTest(BaseTest):
             "video": "",
             "status": "pending"
         }
-        self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_Test)
+        self.app.post('/api/v1/incidents', content_type="application/json", headers={"Authorization": "Bearer " + token}, json=redflag_Test)
         edit_data = {"description": "asVUYI516789"}
         response = self.app.patch('/api/v1/incidents/1/desc', headers={"Authorization": "Bearer " + token}, json=edit_data)
         assert response.status_code == 200
         assert json.loads(response.data)['redflag'][0]['message'] == "description updated"
+
+
+    def test_update_location(self):
+        token = self.return_user_token()
+        redflag_Test = {
+            "description": "aegrehjtr",
+            "image": "5879p",
+            "location": "setjyk",
+            "video": "tfuyilt",
+            "status": "pending"
+        }
+        self.app.post('/api/v1/incidents', content_type="application/json", headers={"Authorization": "Bearer " + token}, json=redflag_Test)
+        location = {"location": "asVUYI516789"}
+        response = self.app.patch('/api/v1/incidents/8/location', headers={"Authorization": "Bearer " + token}, json=location)
+        print(response)
+        assert response.status_code == 200
+        assert json.loads(response.data)['redflag'][0]['message'] == "location updated"    
 
 
     def test_edit_description_without_token(self):
@@ -180,8 +197,9 @@ class IncidentTest(BaseTest):
             "status": "pending"
         }
         self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_Test)
-        response = self.app.delete('/api/v1/incidents/1/delete', headers={"Authorization": "Bearer " + token})
+        response = self.app.delete('/api/v1/incidents/2/delete', headers={"Authorization": "Bearer " + token})
         data = json.loads(response.get_data(as_text=True))
+        print(data)
         self.assertEqual(response.status_code, 200)
         assert json.loads(response.data)['redflag'][0]['message'] == "redflag deleted"
 
@@ -194,21 +212,36 @@ class IncidentTest(BaseTest):
         assert json.loads(response.data)['error'] == "unable to find redflag"
 
 
-    def test_admin_updates_redflag_status(self):
-        user_token = self.return_user_token()
+    def test_admin_updates_redflag_status_without_token(self):
+        status_update = {"status": "under_investigation"}
+        response = self.app.patch('/api/v1/incidents/1/status', json=status_update)
+        assert response.status_code == 401
+        assert json.loads(response.data)['msg'] == "Missing Authorization Header"
+
+
+    def test_admin_update_redflag_status_not_found(self):
         token = self.return_admin_token()
-        redflag_Test = {
+        status_update = {"status": "under_investigation"}
+        response = self.app.patch('/api/v1/incidents/11111/status', headers={"Authorization": "Bearer " + token}, json=status_update)
+        assert response.status_code == 404
+        assert json.loads(response.data)['error'] == "unable to find redflag"
+
+    def test_admin_update_redflag_status(self):
+        token = self.return_user_token()
+        redflag_test = {
             "description": "aegrehjtr",
             "image": "",
             "location": "setjyk",
             "video": "",
             "status": "pending"
         }
-        self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + user_token}, json=redflag_Test)
+        self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_test)
+        token = self.return_admin_token()
         status_update = {"status": "under_investigation"}
         response = self.app.patch('/api/v1/incidents/1/status', headers={"Authorization": "Bearer " + token}, json=status_update)
         assert response.status_code == 200
-        assert json.loads(response.data)['redflag'][0]['message'] == "status updated"
+        assert json.loads(response.data)['redflag'][0]['message'] == "status updated"    
+
 
 
     

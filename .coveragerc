@@ -1,0 +1,50 @@
+[report]
+
+omit =
+    */app.py
+    */.vscode/*
+    */certifi/*
+    */chardet/*
+    */idna/*
+    */requests/*
+    */urllib3/*
+    */encodings/*
+    */hmac.py
+    */http/*
+    */mimetypes.py 
+    */netrc.py
+    */stringprep.py 
+    */tests/__init__.py 
+    */app/__init__.py 
+    */app/manage.py
+    */env/*
+    *//home/travis/virtualenv/*
+    */virtualenv/*
+    */kenv/*
+
+    */decimal.py
+    */asyncio.py
+    */asyncio/*
+    */concurrent.py
+    */concurrent/*
+    */ctypes.py
+    */ctypes/*
+    */html.py
+    */html/entities.py
+    */multiprocessing/connection.py
+    */multiprocessing/util.py 
+    */numbers.py
+    */uuid.py
+    */app.py 
+    */contextvars.py
+    */html/*__init__.py
+    */app/manage.py                  
+    */click/*
+    */colorama/*
+    */flask/*
+    */itsdangerous.py
+    */jinja2/*
+    */markupsafe/*
+    */werkzeug/*
+
+show_missing = True

@@ -17,6 +17,7 @@ user_register = {
 user_login = {
     "email": "kyakusahmed@outlook.com",
     "password": "1988ch"
+
 }
 
 admin_login = {

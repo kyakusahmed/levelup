@@ -29,7 +29,7 @@ def add_intervention():
         return jsonify({"status": 400, "error": datatype_validation}), 400
     
     createdby = current_user[0]
-    incid = interven.add_intervention(
+    incid = interven.create_intervention(
         current_user[0], 
         input['redflag_id'],  
         input['comment'], 
@@ -46,20 +46,20 @@ def delete_intervention(inter_id):
     if current_user[8] == True:
         return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
 
-    intervention = interven.find_intervention(inter_id)
+    intervention = interven.get_intervention(inter_id)
     if not intervention:
         return jsonify({"status": 404, "error": "unable to find intervention"}), 404    
     else:
         if current_user[0] != intervention[1]:
             return jsonify({"status": 400, "error": "intervention does not belong to you"}), 400
 
-        incid = interven.delete_intervention(inter_id)
+        incid = interven.intervention_deleted(inter_id)
         list = [{"inter_id": inter_id, "intervention": incid}] 
         return jsonify({"status": 200, "data": list})   
 
 
 
-@app.route('/api/v1/interventions/<int:incident_id>/comment', methods=['PATCH'])
+@app.route('/api/v1/interventions/<int:incident_id>', methods=['PATCH'])
 @jwt_required 
 def edit_intervention(incident_id):
     """enables a user to edit an intervention"""
@@ -72,7 +72,7 @@ def edit_intervention(incident_id):
     if validate_inputs:
         return jsonify({"status": 400, "error": validate_inputs}), 400
 
-    intervention = interven.find_incident(incident_id)
+    intervention = interven.get_incident(incident_id)
     if not intervention:
         return jsonify({"status": 404, "error": "unable to find incident or intervention"}), 404
 
@@ -80,15 +80,15 @@ def edit_intervention(incident_id):
     if validate_status:
         return validate_status
     else:
-        Incid = interven.update_intervention_comment(incident_id, input["comment"]) 
+        Incid = interven.change_comment(incident_id, input["comment"]) 
         list = [{"incident_id": incident_id, "message": Incid}]
         return jsonify({"status": 200, "redflag" : list}), 200
 
 
-@app.route('/api/v1/interventions/<int:incident_id>/inter_location', methods=['PATCH'])
+@app.route('/api/v1/interventions/<int:incident_id>', methods=['PATCH'])
 @jwt_required 
-def update_inter_location(incident_id):
-    """enables a user to edit an intervention"""
+def change_inter_location(incident_id):
+    """enables a user to change intervention coordinates"""
     current_user = get_jwt_identity()
     if current_user[8] == True:
         return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
@@ -98,7 +98,7 @@ def update_inter_location(incident_id):
     if validate_inputs:
         return jsonify({"status": 400, "error": validate_inputs}), 400
 
-    intervention = interven.find_incident(incident_id)
+    intervention = interven.get_incident(incident_id)
     if not intervention:
         return jsonify({"status": 404, "error": "unable to find incident or intervention"}), 404
 

@@ -8,7 +8,7 @@ class Interventions(DatabaseConnection):
         super().__init__()
 
 
-    def update_intervention_comment(self, comment, incident_id):
+    def change_comment(self, comment, incident_id):
         command = "UPDATE interventions SET comment = '%s' from incidents WHERE incident_id = '%s'" % (incident_id, comment)
         self.cursor.execute(command)
         return "intervention comment updated"
@@ -29,7 +29,7 @@ class Interventions(DatabaseConnection):
         return data
 
 
-    def add_intervention(self, comment_by, redflag_id, comment, inter_location): 
+    def create_intervention(self, comment_by, redflag_id, comment, inter_location): 
         try:
             command = """INSERT INTO interventions (comment_by, redflag_id, comment, comment_type, inter_location, createdon) 
             VALUES('{}', '{}', '{}', '{}', '{}', '{}')
@@ -41,21 +41,20 @@ class Interventions(DatabaseConnection):
             return msg
 
 
-    def delete_intervention(self, inter_id):
+    def intervention_deleted(self, inter_id):
         command = "DELETE from interventions WHERE inter_id = '%s'" % (inter_id)
         self.cursor.execute(command)
         return "inetervention deleted"
 
 
-    def find_incident(self, incident_id):
-        command = """
-        SELECT * from incidents WHERE incident_id ={}
+    def get_incident(self, incident_id):
+        command = """SELECT * from incidents WHERE incident_id ={}
         """.format(incident_id)
         self.cursor.execute(command)
-        data = self.cursor.fetchone()
-        return data   
+        incident = self.cursor.fetchone()
+        return incident   
 
-    def find_intervention(self, inter_id):
+    def get_intervention(self, inter_id):
         command = """SELECT * from interventions WHERE inter_id ={}
         """.format(inter_id)
         self.cursor.execute(command)

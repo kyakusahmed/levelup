@@ -27,7 +27,7 @@ class Incident(DatabaseConnection):
         data = self.cursor.fetchone()
         return data
 
-    def update_incident_location(self, location, incident_id):
+    def incident_location_update(self, location, incident_id):
         command = "UPDATE incidents SET location = '%s' WHERE incident_id = '%s'" % (incident_id, location)
         self.cursor.execute(command)
         return "location updated" 
@@ -66,19 +66,13 @@ class Incident(DatabaseConnection):
     def update_description(self, description, incident_id):
         command = "UPDATE incidents SET description = '%s' WHERE incident_id = '%s'" % (incident_id, description)
         self.cursor.execute(command)
-        return "description updated" 
+        return "description updated"     
 
 
-    def update_location(self, location, incident_id):
-        command = "UPDATE incidents SET location = '%s' WHERE incident_id = '%s'" % (incident_id, location)
-        self.cursor.execute(command)
-        return "location updated"         
-
-
-    def update_user_to_admin(self, user_id, isAdmin):
+    def give_admin_rights_to_user(self, user_id, isAdmin):
         command = "UPDATE users SET isAdmin = '%s' WHERE user_id = '%s'" % (isAdmin, user_id)
         self.cursor.execute(command)
-        return "isAdmin updated"
+        return "user is successfully given admin rights"
 
 
     # def add_user(self, user):

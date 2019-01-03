@@ -74,21 +74,21 @@ def get_all_redflag( ):
     if current_user[8] == False:
         return jsonify({"error": "Unauthorised access"}), 401
 
-    redflag = incident.get_all_incidents() 
-    new_list = []
-    for key in range(len(redflag)):
-        new_list.append({
-            'incident_id': redflag[key][0],
-            'createdby':redflag[key][1],
-            'comment':redflag[key][2],
-            'comment_type':redflag[key][3],
-            'location':redflag[key][4],
-            'image':redflag[key][5],
-            'video':redflag[key][6],
-            'status':redflag[key][7],
-            'createdon':redflag[key][8]
+    red_flag = incident.get_all_incidents() 
+    incident_list = []
+    for key in range(len(red_flag)):
+        incident_list.append({
+            'incident_id': red_flag[key][0],
+            'createdby':red_flag[key][1],
+            'comment':red_flag[key][2],
+            'comment_type':red_flag[key][3],
+            'location':red_flag[key][4],
+            'image':red_flag[key][5],
+            'video':red_flag[key][6],
+            'status':red_flag[key][7],
+            'createdon':red_flag[key][8]
         })
-    return jsonify({"status": 200, "redflagss": new_list}), 200 
+    return jsonify({"status": 200, "redflagss": incident_list}), 200 
 
 
 @app.route('/api/v1/incidents/users/<int:createdby>', methods=['GET'])
@@ -124,7 +124,7 @@ def edit_description(incident_id):
     """enables user to edit redflag"""
     current_user = get_jwt_identity()
     if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
     validate_inputs = validate.input_data_validation(['description'])
@@ -237,7 +237,7 @@ def update_location(incident_id):
         return validate_status    
     
     input = request.get_json()
-    location_update = incident.update_location(incident_id, input['location'])
+    location_update = incident.incident_location_update(incident_id, input['location'])
     list = [{"incident_id": redflag[0], "message": location_update}]  
     return jsonify({"status": 200, "redflag": list}), 200
 

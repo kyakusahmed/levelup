@@ -1,7 +1,7 @@
 from app.models.db_conn import DatabaseConnection
 from datetime import datetime
 import psycopg2
-
+from psycopg2.extensions import AsIs
 class Incident(DatabaseConnection):
 
     def __init__(self):
@@ -34,8 +34,7 @@ class Incident(DatabaseConnection):
 
 
     def get_all_incidents_by_specific_user(self, createdby):
-        command = """
-        SELECT * from incidents WHERE  createdby= {}
+        command = """SELECT * FROM incidents WHERE createdby = '{}'
         """.format(createdby)
         self.cursor.execute(command)
         incidents = self.cursor.fetchall()
@@ -43,8 +42,7 @@ class Incident(DatabaseConnection):
 
 
     def get_all_incidents(self):
-        command = """
-        SELECT * FROM incidents 
+        command = """SELECT * FROM incidents 
         """
         self.cursor.execute(command)
         results= self.cursor.fetchall()
@@ -74,14 +72,4 @@ class Incident(DatabaseConnection):
         self.cursor.execute(command)
         return "user is successfully given admin rights"
 
-
-    # def add_user(self, user):
-    #     try:
-    #         command = """INSERT INTO Users (first_name, last_name , email, password, createdon)
-    #                     VALUES (DEFAULT, %s, %s, %s, %s, %s) RETURNING first_name, last_name , email, password, datetime.now();
-    #                     """
-    #         self.cursor.execute(command)
-    #         user = self.cursor.fetchone()
-    #         return user
-    #     except Exception as ex:
-    #         return "failed {}".format(ex)
+   

@@ -91,32 +91,32 @@ def get_all_redflag( ):
     return jsonify({"status": 200, "redflagss": incident_list}), 200 
 
 
-@app.route('/api/v1/incidents/users/<int:createdby>', methods=['GET'])
+@app.route('/api/v1/users/incidents/<int:createdby>', methods=['GET']) 
 @jwt_required 
 def get_all_user_redflags(createdby):
-    """get all user's redflags/interventions"""
+    """get all redflags"""
     current_user = get_jwt_identity()
     if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access"}), 401
-
-    redflag = incident.get_all_incidents_by_specific_user(createdby)
-    if not redflag:
-        return jsonify({"status": 404, "error": "unable to find any incident created by you"}), 404
-    new_list = []
-    for key in range(len(redflag)):
-        new_list.append({
-            'incident_id': redflag[key][0],
-            'createdby':redflag[key][1],
-            'comment':redflag[key][2],
-            'comment_type':redflag[key][3],
-            'location':redflag[key][4],
-            'image':redflag[key][5],
-            'video':redflag[key][6],
-            'status':redflag[key][7],
-            'createdon':redflag[key][8]
-        })
-    return jsonify({"status": 200, "redflags": new_list}), 200 
-
+        return jsonify({"error": "Unauthorised access"}), 401
+    else:
+        
+        red_flag = incident.get_all_incidents_by_specific_user(createdby)
+        if not red_flag:
+            return jsonify({"status": 404, "error": "unable to find any incident created by you"}), 404
+        incident_list = []
+        for key in range(len(red_flag)):
+            incident_list.append({
+                'incident_id': red_flag[key][0],
+                'createdby':red_flag[key][1],
+                'comment':red_flag[key][2],
+                'comment_type':red_flag[key][3],
+                'location':red_flag[key][4],
+                'image':red_flag[key][5],
+                'video':red_flag[key][6],
+                'status':red_flag[key][7],
+                'createdon':red_flag[key][8]
+            })
+        return jsonify({"status": 200, "redflagss": incident_list}), 200 
 
 @app.route('/api/v1/incidents/<int:incident_id>/desc', methods=['PATCH'])
 @jwt_required 
@@ -140,8 +140,7 @@ def edit_description(incident_id):
         return validate_status
     else:
         Incid = incident.update_description(incident_id, input["description"]) 
-        list = [{"incident_id": incident_id, "message": Incid}]
-        return jsonify({"status": 200, "redflag" : list}), 200 
+        return jsonify({"status": 200, "redflag" : [{"incident_id": incident_id, "message": Incid}]}), 200 
 
 
 @app.route('/api/v1/incidents/<int:incident_id>/delete', methods=['DELETE'])
@@ -160,9 +159,8 @@ def delete_redflag(incident_id):
         if validate_status:
             return validate_status
 
-        incid = incident.delete_redflag(incident_id)
-        list = [{"incident_id": incident_id, "message": incid}] 
-        return jsonify({"status": 200, "redflag": list})
+        delete_redflag = incident.delete_redflag(incident_id)
+        return jsonify({"status": 200, "redflag": [{"incident_id": incident_id, "message": delete_redflag}]})
 
 
 @app.route('/api/v1/incidents/<int:incident_id>/status', methods=['PATCH'])
@@ -191,31 +189,6 @@ def admin_updates_redflag_status(incident_id):
     return jsonify({"status": 200, "redflag": list})
 
 
-# @app.route('/')
-# def sendemail(email, subject, body):
-#     '''send email to a user'''
-#     app.config.update(
-#         DEBUG=True,
-#         # EMAIL SETTINGS
-#         MAIL_SERVER='smtp.gmail.com',
-#         MAIL_PORT=465,
-#         MAIL_USE_SSL=True,
-#         MAIL_USERNAME=os.environ.get('EMAIL'),
-#         MAIL_PASSWORD=os.environ.get('PASS')
-
-#     )
-
-#     mail = Mail(app)
-#     try:
-#         message = Message(subject, sender="crycetruly@gmail.com", recipients=[email])
-#         message.body = body
-#         mail.send(message)
-#         return 'mail sent'
-#     except Exception as identifier:
-#         pass
-
-
-
 @app.route('/api/v1/incidents/<int:incident_id>/location', methods=['PATCH'])
 @jwt_required 
 def update_location(incident_id):
@@ -237,49 +210,7 @@ def update_location(incident_id):
         return validate_status    
     
     input = request.get_json()
-    location_update = incident.incident_location_update(incident_id, input['location'])
-    list = [{"incident_id": redflag[0], "message": location_update}]  
-    return jsonify({"status": 200, "redflag": list}), 200
-
-     
-       
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-      
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
+    location_updated = incident.incident_location_update(incident_id, input['location'])
+    return jsonify({"status": 200, "redflag": [{"incident_id": redflag[0], "message": location_updated}]}), 200
 
 

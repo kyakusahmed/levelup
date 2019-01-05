@@ -14,13 +14,15 @@ omit =
     */mimetypes.py 
     */netrc.py
     */stringprep.py 
-    */tests/__init__.py 
-    */app/__init__.py 
+    */tests/__init__.py
     */app/manage.py
     */env/*
     *//home/travis/virtualenv/*
     */virtualenv/*
     */kenv/*
+    */tests/*
+    */views/__init__.py
+    */models/__init__.py
 
     */decimal.py
     */asyncio.py

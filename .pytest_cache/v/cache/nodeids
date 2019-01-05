@@ -25,8 +25,18 @@
   "tests/test_views.py::IncidentTest::test_get_specific_redflag_without_token",
   "tests/test_views.py::IncidentTest::test_update_location",
   "tests/test_views.py::InterventionsTest::test_add_intervention",
+  "tests/test_views.py::InterventionsTest::test_add_intervention_redflag_id_doesnot_exist",
   "tests/test_views.py::InterventionsTest::test_add_intervention_with_out_token",
-  "tests/test_views.py::InterventionsTest::test_add_inyervention_redflag_id_doesnot_exist",
+  "tests/test_views.py::InterventionsTest::test_change_inter_location",
   "tests/test_views.py::InterventionsTest::test_comment_is_missing",
-  "tests/test_views.py::InterventionsTest::test_edit_comment"
+  "tests/test_views.py::InterventionsTest::test_delete_intervention",
+  "tests/test_views.py::InterventionsTest::test_delete_intervention_without_token",
+  "tests/test_views.py::InterventionsTest::test_edit_comment",
+  "tests/test_views.py::InterventionsTest::test_edit_comment_comment_missing",
+  "tests/test_views.py::InterventionsTest::test_edit_comment_comment_missing_without_token",
+  "tests/test_views.py::InterventionsTest::test_find_one_intervention",
+  "tests/test_views.py::InterventionsTest::test_view_all_interventions",
+  "tests/test_views.py::InterventionsTest::test_view_all_interventions_without_token",
+  "tests/test_views.py::InterventionsTest::test_view_all_user_interventions",
+  "tests/test_views.py::InterventionsTest::test_view_all_user_interventions_without_token"
 ]

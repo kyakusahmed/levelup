@@ -170,7 +170,6 @@ class IncidentTest(BaseTest):
         response = self.app.get('/api/v1/incidents/1', headers={"Authorization": "Bearer " + token})
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
-        # self.assertIsInstance(data['redflag'], dict)
             
 
     def test_get_specific_redflag_not_found(self):
@@ -206,15 +205,13 @@ class IncidentTest(BaseTest):
             "status": "pending"
         }
         self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_Test)
-        response = self.app.get('/api/v1/incidents/users/2', headers={"Authorization": "Bearer " + token})
+        response = self.app.get('/api/v1/users/incidents/2', headers={"Authorization": "Bearer " + token})
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
         assert json.loads(response.data)['status'] == 200
-        self.assertIsInstance(data['redflags'], list) 
-
 
     def test_get_all_user_redflags_without_token(self):
-        response = self.app.get('/api/v1/incidents/users/2')
+        response = self.app.get('/api/v1/users/incidents/2')
         data = json.loads(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 401)
         assert json.loads(response.data)['msg'] == "Missing Authorization Header"
@@ -361,7 +358,7 @@ class InterventionsTest(BaseTest):
         assert json.loads(response.data)['status'] == 201
 
 
-    def test_add_inyervention_redflag_id_doesnot_exist(self):
+    def test_add_intervention_redflag_id_doesnot_exist(self):
         """Test with redflag_id which doesnot exist"""
         token = self.return_user_token()
         test_data = {
@@ -418,4 +415,144 @@ class InterventionsTest(BaseTest):
         headers={"Authorization": "Bearer " + token}, json=update_comment)
         assert response.status_code == 200
         assert json.loads(response.data)['redflag'][0]['message'] == "intervention comment updated"
+
+
+    def test_edit_comment_comment_missing(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", 
+        headers={"Authorization": "Bearer " + token}, json=test_data)
+        update_comment = {"comment": ""}
+        response = self.app.patch('/api/v1/interventions/1/comment', 
+        headers={"Authorization": "Bearer " + token}, json=update_comment)
+        assert response.status_code == 400
+        assert json.loads(response.data)['error']['message'] == "comment is required"
    
+   
+    def test_edit_comment_comment_missing_without_token(self):
+        update_comment = {"comment": ""}
+        response = self.app.patch('/api/v1/interventions/1/comment', json=update_comment)
+        assert response.status_code == 401
+        assert json.loads(response.data)['msg'] == "Missing Authorization Header"
+
+
+    def test_delete_intervention(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", 
+        headers={"Authorization": "Bearer " + token}, json=test_data)
+        response = self.app.delete('/api/v1/interventions/1/2/delete', 
+        headers={"Authorization": "Bearer " + token})
+        assert response.status_code == 200
+
+
+    def test_delete_intervention_without_token(self):
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", json=test_data)
+        response = self.app.delete('/api/v1/interventions/1/2/delete')
+        assert response.status_code == 401
+        assert json.loads(response.data)['msg'] == "Missing Authorization Header"
+
+
+    def test_change_inter_location(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", 
+        headers={"Authorization": "Bearer " + token}, json=test_data)
+        update_location = {"inter_location": "0.5, 32.9"}
+        response = self.app.patch('/api/v1/interventions/1/inter', 
+        headers={"Authorization": "Bearer " + token}, json=update_location)
+        assert response.status_code == 200
+        assert json.loads(response.data)['data'][0]['intervention'] == "intervention comment updated"
+
+
+    def test_view_all_interventions(self):
+        admin_token = self.return_admin_token()
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", 
+        headers={"Authorization": "Bearer " + token}, json=test_data)
+        response = self.app.get(
+            '/api/v1/interventions', headers={"Authorization": "Bearer " + admin_token})
+        assert response.status_code == 200
+
+
+    def test_view_all_interventions_without_token(self):
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", json=test_data)
+        response = self.app.get('/api/v1/interventions')
+        assert response.status_code == 401
+        assert json.loads(response.data)['msg'] == "Missing Authorization Header"
+
+
+    def test_view_all_user_interventions(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}, json=test_data
+            )
+        response = self.app.get(
+            '/api/v1/users/interventions/2', content_type="application/json",
+            headers={"Authorization": "Bearer " + token})
+        assert response.status_code == 200
+
+
+    def test_view_all_user_interventions_without_token(self):
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post('/api/v1/interventions', content_type="application/json", json=test_data)
+        response = self.app.get('/api/v1/users/interventions/2')
+        assert response.status_code == 401
+
+
+    def test_find_one_intervention(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}, json=test_data
+            )
+        response = self.app.get(
+            '/api/v1/interventions/4/2', content_type="application/json",
+            headers={"Authorization": "Bearer " + token})
+        assert response.status_code == 200
+    
+
+        
+

@@ -66,8 +66,7 @@ def get_specific_redflag(incident_id):
 
 
 @app.route('/api/v1/incidents', methods=['GET']) 
-@jwt_required 
-
+@jwt_required
 def get_all_redflag( ):
     """get all redflags"""
     current_user = get_jwt_identity()

@@ -93,11 +93,11 @@ def change_inter_location(incident_id):
     if validate_inputs:
         return jsonify({"status": 400, "error": validate_inputs}), 400
 
-    intervention = interven.get_incident(incident_id)
-    if not intervention:
+    redflag = interven.get_incident(incident_id)
+    if not redflag:
         return jsonify({"status": 404, "error": "unable to find incident or intervention"}), 404
 
-    validate_status = validate.validate_status(intervention[7])
+    validate_status = validate.validate_status(redflag[7])
     if validate_status:
         return validate_status
     else:

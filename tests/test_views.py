@@ -349,7 +349,7 @@ class IncidentTest(BaseTest):
         edit_desc = {"description": "wqcbvow"}
         response = self.app.patch('/api/v1/incidents/3/desc', headers={"Authorization": "Bearer " + token}, json=edit_desc)
         assert response.status_code == 400
-        assert json.loads(response.data)['error'] == "description cannot be changed because redflag is already resolved"    
+        assert json.loads(response.data)['error'] == "field cannot be changed because redflag is already resolved"    
         
 
 
@@ -433,7 +433,10 @@ class IncidentTest(BaseTest):
     def test_admin_updates_redflag_status_with_user_token(self):
         token = self.return_user_token()
         status_update = {"status": "under_investigation"}
-        response = self.app.patch('/api/v1/incidents/1/status', headers={"Authorization": "Bearer " + token}, json=status_update)
+        response = self.app.patch(
+            '/api/v1/incidents/1/status', headers={"Authorization": "Bearer " + token},
+            json=status_update
+            )
         assert response.status_code == 401
         assert json.loads(response.data)['error'] == "Unauthorised Access"
 
@@ -443,8 +446,7 @@ class IncidentTest(BaseTest):
         location_update = {"location": "0.54, 32.1"}
         response = self.app.patch('/api/v1/incidents/1/location', headers={"Authorization": "Bearer " + token}, json=location_update)
         assert response.status_code == 401
-        assert json.loads(response.data)['error'] == "Unauthorised Access"     
-
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
 
 
     def test_delete_redflag(self):
@@ -872,7 +874,9 @@ class InterventionsTest(BaseTest):
             '/api/v1/users/interventions/2', content_type="application/json",
             headers={"Authorization": "Bearer " + token})
         assert response.status_code == 200
-
+        self.assertIsInstance(json.loads(response.data.decode('utf-8')).get('redflags'), list)
+        self.assertEqual(json.loads(response.data.decode('utf-8')).get('interventions')[0]['status'], 200)
+        
 
     def test_view_all_user_interventions(self):
         token = self.return_admin_token()
@@ -889,7 +893,18 @@ class InterventionsTest(BaseTest):
             '/api/v1/users/interventions/2', content_type="application/json",
             headers={"Authorization": "Bearer " + token})
         assert response.status_code == 401
-        assert json.loads(response.data)['error'] == "Unauthorised Access"    
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
+
+    def test_view_all_user_interventions_not_found(self):
+        token = self.return_user_token()
+        response = self.app.get(
+            '/api/v1/users/interventions/4000', content_type="application/json",
+            headers={"Authorization": "Bearer " + token})
+        assert response.status_code == 404
+        assert json.loads(response.data)['error'] == "unable to find any intervention by you"    
+
+        
 
 
     def test_view_all_user_interventions_without_token(self):
@@ -919,6 +934,136 @@ class InterventionsTest(BaseTest):
             '/api/v1/interventions/4/2', content_type="application/json",
             headers={"Authorization": "Bearer " + token})
         assert response.status_code == 200
+
+
+    def test_find_one_intervention_with_admin_token(self):
+        token = self.return_admin_token()
+        user_token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + user_token}, json=test_data
+            )
+        response = self.app.get(
+            '/api/v1/interventions/4/2', content_type="application/json",
+            headers={"Authorization": "Bearer " + token})
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised access"
+
+
+    def test_find_one_intervention_not_found(self):
+        token = self.return_user_token()
+        response = self.app.get(
+            '/api/v1/interventions/40000/2', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}
+            )
+        assert response.status_code == 404
+        assert json.loads(response.data)['error'] == "unable to find intervention"
+
+
+    def test_change_inter_location_with_incident_status_rejected(self):
+        token = self.return_user_token()
+        admin_token = self.return_admin_token()
+        incident_Test = {
+            "description": "w3y45u w4u5ik 5w5i63",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post(
+            '/api/v1/incidents', headers={"Authorization": "Bearer " + token},
+            json=incident_Test
+            )
+        test_data = {
+            "redflag_id": 1,
+            "comment": "rctyhvubinoui",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', headers={"Authorization": "Bearer " + token},
+            json=test_data
+            )
+        status_update = {"status": "resolved"}
+        self.app.patch(
+            '/api/v1/incidents/11/status', headers={"Authorization": "Bearer " + admin_token},
+            json=status_update
+            )    
+        update_location = {"inter_location": "vwwvbab"}
+        response = self.app.patch(
+            '/api/v1/interventions/11/inter', 
+            headers={"Authorization": "Bearer " + token}, json=update_location
+            )
+        self.assertEqual(response.status_code, 400)
+        assert json.loads(response.data)['error'] == "field cannot be changed because redflag is already resolved"
+
+
+    def test_edit_intervention_with_incident_status_rejected(self):
+        token = self.return_user_token()
+        admin_token = self.return_admin_token()
+        incident_Test = {
+            "description": "w3y45u w4u5ik 5w5i63",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post(
+            '/api/v1/incidents', headers={"Authorization": "Bearer " + token},
+            json=incident_Test
+            )
+        test_data = {
+            "redflag_id": 1,
+            "comment": "rctyhvubinoui",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', headers={"Authorization": "Bearer " + token},
+            json=test_data
+            )
+        status_update = {"status": "resolved"}
+        self.app.patch(
+            '/api/v1/incidents/11/status', headers={"Authorization": "Bearer " + admin_token},
+            json=status_update
+            )    
+        edit_comment = {"comment": "vwwvbab"}
+        response = self.app.patch(
+            '/api/v1/interventions/11/comment', 
+            headers={"Authorization": "Bearer " + token}, json=edit_comment
+            )
+        self.assertEqual(response.status_code, 400)
+        assert json.loads(response.data)['error'] == "field cannot be changed because redflag is already resolved"
+
+
+    def test_add_intervention_datatype_validation_error(self):
+        token = self.return_user_token()
+        incident_Test = {
+            "description": "w3y45u w4u5ik 5w5i63",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post(
+            '/api/v1/incidents', headers={"Authorization": "Bearer " + token},
+            json=incident_Test
+            )
+        test_data = {
+            "redflag_id": "ivyoobl",
+            "comment": "rctyhvubinoui",
+            "inter_location": "0.5, 32.5"
+        }
+        response = self.app.post(
+            '/api/v1/interventions', headers={"Authorization": "Bearer " + token},
+            json=test_data
+            )
+        self.assertEqual(response.status_code, 400)            
+         
+       
     
 
         

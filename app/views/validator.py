@@ -48,7 +48,7 @@ class Validation:
 
     def validate_status(self, status):
         if status in ['rejected', 'resolved']:
-            return jsonify({"status": 400, "error": "description cannot be changed because redflag is already " + status }), 400
+            return jsonify({"status": 400, "error": "field cannot be changed because redflag is already " + status }), 400
         return None
 
     # def location_validate(self, list):

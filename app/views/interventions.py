@@ -16,8 +16,8 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'
 @jwt_required
 def add_intervention():
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
     validate_inputs = validate.input_data_validation(['redflag_id','inter_location','comment'])
@@ -43,19 +43,15 @@ def add_intervention():
 def delete_intervention(inter_id, comment_by):
     """enables user to delete a specific redflag"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     intervention = interven.get_intervention(inter_id, comment_by)
     if not intervention:
         return jsonify({"status": 404, "error": "unable to find intervention"}), 404    
     else:
-        if current_user[0] != intervention[1]:
-            return jsonify({"status": 400, "error": "intervention does not belong to you"}), 400
-
         incid = interven.intervention_deleted(inter_id, comment_by) 
-        return jsonify({"status": 200,
-    "data":[{"inter_id": inter_id, "comment_by": comment_by, "intervention": incid}]})   
+        return jsonify({"status": 200, "data":[{"inter_id": inter_id, "comment_by": comment_by, "intervention": incid}]}), 200   
 
 
 
@@ -64,19 +60,19 @@ def delete_intervention(inter_id, comment_by):
 def edit_intervention(incident_id):
     """enables a user to edit an intervention"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
     validate_inputs = validate.input_data_validation(['comment'])
     if validate_inputs:
         return jsonify({"status": 400, "error": validate_inputs}), 400
 
-    intervention = interven.get_incident(incident_id)
-    if not intervention:
+    find_incident = interven.get_incident(incident_id)
+    if not find_incident:
         return jsonify({"status": 404, "error": "unable to find incident or intervention"}), 404
 
-    validate_status = validate.validate_status(intervention[7])
+    validate_status = validate.validate_status(find_incident[7])
     if validate_status:
         return validate_status
     else:
@@ -89,8 +85,8 @@ def edit_intervention(incident_id):
 def change_inter_location(incident_id):
     """enables a user to change intervention coordinates"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
     validate_inputs = validate.input_data_validation(['inter_location'])
@@ -114,7 +110,7 @@ def change_inter_location(incident_id):
 def view_all_interventions( ):
     """view all interventions"""
     current_user = get_jwt_identity()
-    if current_user[8] == False:
+    if current_user[8] == "user":
         return jsonify({"error": "Unauthorised access"}), 401
 
     interventions = interven.view_all_interventions() 
@@ -137,7 +133,7 @@ def view_all_interventions( ):
 def view_all_user_interventions(comment_by):
     """get all user's redflags/interventions"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
+    if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised Access"}), 401
     else:
         interventions = interven.view_all_interventions_by_specific_user(comment_by)
@@ -163,7 +159,7 @@ def view_all_user_interventions(comment_by):
 def find_one_intervention(inter_id, comment_by):
     """get a specific intervention"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
+    if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised access"}), 401
 
     redflag = interven.get_intervention(inter_id, comment_by) 

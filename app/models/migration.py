@@ -34,7 +34,7 @@ class Migration(DatabaseConnection):
             PASSWORD VARCHAR(50) NOT NULL,
             PHONE_NUMBER VARCHAR(50),
             USERNAME VARCHAR(50), 
-            isAdmin BOOLEAN NOT null,
+            ROLE VARCHAR(50) NOT NULL,
             createdOn timestamp(6) without time zone
             )
         """,
@@ -63,7 +63,7 @@ class Migration(DatabaseConnection):
             createdOn timestamp(6) without time zone
             )
         """,    
-        """ INSERT INTO USERS(first_name, last_name, email, password, isAdmin)VALUES('ahmad', 'kyakus', 'kyakuluahmed@gmail.com', 'ch1988', True)
+        """ INSERT INTO USERS(first_name, last_name, email, password, role)VALUES('ahmad', 'kyakus', 'kyakuluahmed@gmail.com', 'ch1988', 'admin')
         """    
         )
         for command in commands:

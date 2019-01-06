@@ -2,5 +2,7 @@
   "tests/test_interventions.py::InterventionsTest::test_add_inyervention_without_redflag_id": true,
   "tests/test_redflag.py::IncidentTest::test_get_all_redflag": true,
   "tests/test_redflag.py::IncidentTest::test_get_all_redflags": true,
-  "tests/test_redflag.py::IncidentTest::test_get_redflags": true
+  "tests/test_redflag.py::IncidentTest::test_get_redflags": true,
+  "tests/test_views.py::IncidentTest::test_get_all_redflags_with_admin_token": true,
+  "tests/test_views.py::UserTest::test_update_user_to_admin_not_role": true
 }

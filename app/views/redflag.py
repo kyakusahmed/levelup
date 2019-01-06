@@ -1,14 +1,13 @@
 from flask import jsonify, request
 import datetime
 from app.models.redflag import Incident
+from app.models.auth import User
 from app.views.validator import Validation
 from app import app
 from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity,jwt_optional)
-# from flask_mail import Message, Mail
 import os
 
-
-
+user = User()
 incident = Incident()
 validate = Validation()
 jwt = JWTManager(app)
@@ -19,7 +18,7 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'
 @jwt_required
 def add_incidet():
     current_user = get_jwt_identity()
-    if current_user[8] == True:
+    if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
@@ -47,8 +46,8 @@ def add_incidet():
 def get_specific_redflag(incident_id):
     """get a specific redflag"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised access"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     redflag = incident.find_incident(incident_id) 
     if not redflag:
@@ -68,10 +67,11 @@ def get_specific_redflag(incident_id):
 
 @app.route('/api/v1/incidents', methods=['GET']) 
 @jwt_required 
+
 def get_all_redflag( ):
     """get all redflags"""
     current_user = get_jwt_identity()
-    if current_user[8] == False:
+    if current_user[8] == "user":
         return jsonify({"error": "Unauthorised access"}), 401
 
     red_flag = incident.get_all_incidents() 
@@ -96,10 +96,9 @@ def get_all_redflag( ):
 def get_all_user_redflags(createdby):
     """get all redflags"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
+    if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised access"}), 401
     else:
-        
         red_flag = incident.get_all_incidents_by_specific_user(createdby)
         if not red_flag:
             return jsonify({"status": 404, "error": "unable to find any incident created by you"}), 404
@@ -123,7 +122,7 @@ def get_all_user_redflags(createdby):
 def edit_description(incident_id):
     """enables user to edit redflag"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
+    if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
@@ -148,8 +147,8 @@ def edit_description(incident_id):
 def delete_redflag(incident_id):
     """enables user to delete a specific redflag"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     redflag = incident.find_incident(incident_id)
     if not redflag:
@@ -168,7 +167,7 @@ def delete_redflag(incident_id):
 def admin_updates_redflag_status(incident_id):
     """enables user to update specific redflag status"""
     current_user = get_jwt_identity()
-    if current_user[8] != True:
+    if current_user[8] != "admin":
         return jsonify({"error": "Unauthorised Access"}), 401
 
     input = request.get_json()
@@ -194,8 +193,8 @@ def admin_updates_redflag_status(incident_id):
 def update_location(incident_id):
     """enables user to update specific redflag location"""
     current_user = get_jwt_identity()
-    if current_user[8] == True:
-        return jsonify({"error": "Unauthorised Access for none user accounts"}), 401
+    if current_user[8] == "admin":
+        return jsonify({"error": "Unauthorised Access"}), 401
 
     validate_inputs = validate.input_data_validation(['location'])
     if validate_inputs:
@@ -212,5 +211,4 @@ def update_location(incident_id):
     input = request.get_json()
     location_updated = incident.incident_location_update(incident_id, input['location'])
     return jsonify({"status": 200, "redflag": [{"incident_id": redflag[0], "message": location_updated}]}), 200
-
-
+    

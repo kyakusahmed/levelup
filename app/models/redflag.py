@@ -50,16 +50,12 @@ class Incident(DatabaseConnection):
 
 
     def add_redflag(self, createdby, description, location, image, video):
-        try: 
-            command = """INSERT INTO incidents (createdby, description, comment_type, location, image, video, status, createdon) 
-            VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
-            """.format(createdby, description,"redflag", location, image, video, "pending", datetime.now())
-            self.cursor.execute(command)
-            return "redflag added successfully"
-        except psycopg2.IntegrityError:
-            msg = "user_id doesnot exist in users and therefore redflag not created"
-            return msg     
-
+        command = """INSERT INTO incidents (createdby, description, comment_type, location, image, video, status, createdon) 
+        VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
+        """.format(createdby, description,"redflag", location, image, video, "pending", datetime.now())
+        self.cursor.execute(command)
+        return "redflag added successfully"
+    
 
     def update_description(self, description, incident_id):
         command = "UPDATE incidents SET description = '%s' WHERE incident_id = '%s'" % (incident_id, description)
@@ -67,9 +63,5 @@ class Incident(DatabaseConnection):
         return "description updated"     
 
 
-    def give_admin_rights_to_user(self, user_id, isAdmin):
-        command = "UPDATE users SET isAdmin = '%s' WHERE user_id = '%s'" % (isAdmin, user_id)
-        self.cursor.execute(command)
-        return "user is successfully given admin rights"
-
+   
    

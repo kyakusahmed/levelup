@@ -43,13 +43,13 @@ class Validation:
 
     def validate_status_location(self, status):
         if status in ['rejected', 'resolved', 'under_investigation']:
-            return jsonify({"status": 400, "error": "location cannot be changed because redflag is already " + status }), 400
+            return jsonify({"status": 400, "error": "location cannot be changed because redflag its already " + status }), 400
         return None    
 
     def validate_status(self, status):
         if status in ['rejected', 'resolved']:
-            return jsonify({"status": 400, "error": "status cannot be changed because redflag is already " + status }), 400
-        return None 
+            return jsonify({"status": 400, "error": "description cannot be changed because redflag is already " + status }), 400
+        return None
 
     # def location_validate(self, list):
     #     location = 'lat,lng'

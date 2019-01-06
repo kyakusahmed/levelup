@@ -7,10 +7,10 @@ class User(DatabaseConnection):
     def __init__(self):
         super().__init__()
 
-    def register_user(self, first_name, last_name, email, password, isAdmin):
+    def register_user(self, first_name, last_name, email, password, role):
         command = """
-        INSERT INTO USERS (first_name, last_name, email, password, isAdmin, createdon) VALUES('{}','{}','{}','{}','{}','{}')
-        """.format(first_name, last_name, email, password, isAdmin, datetime.now())
+        INSERT INTO USERS (first_name, last_name, email, password, role, createdon) VALUES('{}','{}','{}','{}','{}','{}')
+        """.format(first_name, last_name, email, password, role, datetime.now())
         self.cursor.execute(command)
         return "user registered successfully"
     
@@ -22,7 +22,6 @@ class User(DatabaseConnection):
         self.cursor.execute(command)
         user1 = self.cursor.fetchone()
         return user1
-        
 
      
     def get_user_by_email(self, email):
@@ -31,7 +30,22 @@ class User(DatabaseConnection):
         """.format(email)
         self.cursor.execute(command)
         user = self.cursor.fetchone()
-        return user        
+        return user 
+
+
+    def get_user_by_user_id(self, user_id):
+        command = """SELECT * FROM users WHERE user_id ='{}'
+        """.format(user_id)
+        self.cursor.execute(command)
+        user = self.cursor.fetchone()
+        return user
+
+
+    def give_admin_rights_to_user(self, user_id, role):
+        command = "UPDATE users SET role = '%s' WHERE user_id = '%s'" % (role, user_id)
+        self.cursor.execute(command)
+        return "user is successfully given admin rights"
+           
     
 
     

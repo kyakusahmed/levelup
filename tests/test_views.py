@@ -12,7 +12,7 @@ class UserTest(BaseTest):
             "last_name":"kyakus",
             "email": "kyakusahmed@out.com",
             "password": "1988ch",
-            "isAdmin": False
+            "role": "user"
         }
         response = self.app.post('/api/v1/users/register', json=regiseter_user)
         self.assertEqual(response.status_code, 201)
@@ -25,7 +25,7 @@ class UserTest(BaseTest):
             "last_name":"kyakus",
             "email": "kyakusahmed@outlook.com",
             "password": "1988ch",
-            "isAdmin": False
+            "role": "user"
         }
         response = self.app.post('/api/v1/users/register', json=regiseter_user)
         self.assertEqual(response.status_code, 400)
@@ -38,7 +38,7 @@ class UserTest(BaseTest):
             "last_name":"kyakus",
             "email": "kyakusahmed@outlook.com",
             "password": "1988ch",
-            "isAdmin": False
+            "role": "user"
         }
         self.app.post('/api/v1/users/register', json=register_user)
         response = self.app.post('/api/v1/users/register', json=register_user)
@@ -52,7 +52,7 @@ class UserTest(BaseTest):
             "last_name":"kyakus",
             "email": "kyakusahmed@outlook.com",
             "password": "1988ch",
-            "isAdmin": False
+            "role": "user"
         }
         self.app.post('/api/v1/users/register', json=register_user)
         response = self.app.post('/api/v1/users/login', json=register_user)
@@ -85,11 +85,56 @@ class UserTest(BaseTest):
             "last_name":"kyakus",
             "email": "kyaku@outlook.com",
             "password": "18fh",
-            "isAdmin": False
+            "role": "user"
         }
         response = self.app.post('/api/v1/users/register', json=register_user)
         self.assertEqual(response.status_code, 400)
         assert json.loads(response.data)['error'] == "password should be atleast five characters"
+
+
+    def test_update_user_to_admin(self):
+        token = self.return_admin_token()
+        register_user = {
+            "first_name":"avdb",
+            "last_name":"kyakus",
+            "email": "kyaku@outlook.com",
+            "password": "18fh67ge",
+            "role": "user"
+        }
+        response = self.app.post('/api/v1/users/register', json=register_user)
+        data = {"role": "admin"}
+        response = self.app.put(
+            '/api/v1/users/3', headers={"Authorization": "Bearer " + token},
+            json=data
+            )
+        self.assertEqual(response.status_code, 200)
+        test_data = {"role": "iaso"}
+        response = self.app.put(
+            '/api/v1/users/3', headers={"Authorization": "Bearer " + token},
+            json=test_data
+            )
+        self.assertEqual(response.status_code, 406)
+        assert json.loads(response.data)['message'] == "role doesnt exist"
+
+
+    def test_update_user_to_admin_not_found(self):
+        token = self.return_admin_token()
+        data = {"role": "admin"}
+        response = self.app.put(
+            '/api/v1/users/3000', headers={"Authorization": "Bearer " + token},
+            json=data
+            )
+        self.assertEqual(response.status_code, 404)
+        
+
+    def test_update_user_to_admin_with_user_token(self):
+        token = self.return_user_token()
+        data = {"role": "admin"}
+        response = self.app.put(
+            '/api/v1/users/3000', headers={"Authorization": "Bearer " + token},
+            json=data
+            )
+        self.assertEqual(response.status_code, 401)
 
 
 
@@ -113,7 +158,7 @@ class IncidentTest(BaseTest):
 
 
     def test_description_is_missing(self):
-        """Test successful register"""
+        """Test register with an empty string for description"""
         token = self.return_user_token()
         incident_Test = {
             "description": "",
@@ -179,6 +224,28 @@ class IncidentTest(BaseTest):
         assert json.loads(response.data)['error'] == "unable to find redflag"
 
 
+    def test_get_specific_redflag_with_admin_token(self):
+        token = self.return_admin_token()
+        response = self.app.get('/api/v1/incidents/1500', headers={"Authorization": "Bearer " + token})
+        self.assertEqual(response.status_code, 401)
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
+
+    def test_get_all_user_redflags_with_admin_token(self):
+        token = self.return_admin_token()
+        response = self.app.get('/api/v1/users/incidents/2', headers={"Authorization": "Bearer " + token})
+        self.assertEqual(response.status_code, 401)
+        assert json.loads(response.data)['error'] == "Unauthorised access"
+
+
+    def test_get_all_user_redflags_not_found(self):
+        token = self.return_user_token()
+        response = self.app.get('/api/v1/users/incidents/5000', headers={"Authorization": "Bearer " + token})
+        self.assertEqual(response.status_code, 404)
+        assert json.loads(response.data)['error'] == "unable to find any incident created by you"     
+
+
+
     def test_get_redflags_with_user_token(self):
         token = self.return_user_token()
         redflag_Test = {
@@ -210,6 +277,23 @@ class IncidentTest(BaseTest):
         self.assertEqual(response.status_code, 200)
         assert json.loads(response.data)['status'] == 200
 
+
+    def test_get_all_redflags(self):
+        token = self.return_admin_token()
+        redflag_Test = {
+            "description": "aegrehjtr",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_Test)
+        response = self.app.get('/api/v1/incidents', headers={"Authorization": "Bearer " + token})
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 200)
+        assert json.loads(response.data)['status'] == 200
+    
+
     def test_get_all_user_redflags_without_token(self):
         response = self.app.get('/api/v1/users/incidents/2')
         data = json.loads(response.get_data(as_text=True))
@@ -233,6 +317,42 @@ class IncidentTest(BaseTest):
         assert json.loads(response.data)['redflag'][0]['message'] == "description updated"
 
 
+    def test_edit_description_empty_string_validation(self):
+        token = self.return_user_token()
+        redflag_Test = {
+            "description": "aegrehjtr",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post('/api/v1/incidents', content_type="application/json", headers={"Authorization": "Bearer " + token}, json=redflag_Test)
+        edit_data = {"description": ""}
+        response = self.app.patch('/api/v1/incidents/1/desc', headers={"Authorization": "Bearer " + token}, json=edit_data)
+        assert response.status_code == 400
+        assert json.loads(response.data)['error']['message'] == "description is required"
+
+
+    def test_edit_description_failed(self):
+        admin_token = self.return_admin_token()
+        token = self.return_user_token()
+        test_data = {
+            "description": "aegrehjtr",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post('/api/v1/incidents', content_type="application/json", headers={"Authorization": "Bearer " + token}, json=test_data)
+        update_status = {"status": "resolved"}
+        response = self.app.patch('/api/v1/incidents/3/status', headers={"Authorization": "Bearer " + admin_token}, json=update_status)
+        edit_desc = {"description": "wqcbvow"}
+        response = self.app.patch('/api/v1/incidents/3/desc', headers={"Authorization": "Bearer " + token}, json=edit_desc)
+        assert response.status_code == 400
+        assert json.loads(response.data)['error'] == "description cannot be changed because redflag is already resolved"    
+        
+
+
     def test_update_location(self):
         token = self.return_user_token()
         redflag_Test = {
@@ -247,7 +367,25 @@ class IncidentTest(BaseTest):
         response = self.app.patch('/api/v1/incidents/8/location', headers={"Authorization": "Bearer " + token}, json=location)
         print(response)
         assert response.status_code == 200
-        assert json.loads(response.data)['redflag'][0]['message'] == "location updated"    
+        assert json.loads(response.data)['redflag'][0]['message'] == "location updated"
+
+
+    def test_update_location_for_redflag_not_found(self):
+        token = self.return_user_token()
+        redflag_Test = {
+            "description": "aegrehjtr",
+            "image": "5879p",
+            "location": "setjyk",
+            "video": "tfuyilt",
+            "status": "pending"
+        }
+        self.app.post('/api/v1/incidents', content_type="application/json", headers={"Authorization": "Bearer " + token}, json=redflag_Test)
+        location = {"location": "asVUYI516789"}
+        response = self.app.patch('/api/v1/incidents/5000/location', headers={"Authorization": "Bearer " + token}, json=location)
+        print(response)
+        assert response.status_code == 404
+        assert json.loads(response.data)['error'] == "unable to find redflag"
+
 
 
     def test_edit_description_without_token(self):
@@ -275,6 +413,40 @@ class IncidentTest(BaseTest):
         assert json.loads(response.data)['error'] == "unable to find redflag"
 
 
+    def test_edit_description_incident_with_admin_token(self):
+        token = self.return_admin_token()
+        edit_data = {"description": "asVUYI516789"}
+        response = self.app.patch('/api/v1/incidents/4000/desc', headers={"Authorization": "Bearer " + token}, json=edit_data)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 401)
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
+
+    def test_delete_redflag_with_admin_token(self):
+        token = self.return_admin_token()
+        response = self.app.delete('/api/v1/incidents/3/delete', headers={"Authorization": "Bearer " + token})
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 401)
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
+
+    def test_admin_updates_redflag_status_with_user_token(self):
+        token = self.return_user_token()
+        status_update = {"status": "under_investigation"}
+        response = self.app.patch('/api/v1/incidents/1/status', headers={"Authorization": "Bearer " + token}, json=status_update)
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
+
+    def test_update_location_status_with_admin_token(self):
+        token = self.return_admin_token()
+        location_update = {"location": "0.54, 32.1"}
+        response = self.app.patch('/api/v1/incidents/1/location', headers={"Authorization": "Bearer " + token}, json=location_update)
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised Access"     
+
+
+
     def test_delete_redflag(self):
         token = self.return_user_token()
         redflag_Test = {
@@ -287,9 +459,26 @@ class IncidentTest(BaseTest):
         self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=redflag_Test)
         response = self.app.delete('/api/v1/incidents/2/delete', headers={"Authorization": "Bearer " + token})
         data = json.loads(response.get_data(as_text=True))
-        print(data)
         self.assertEqual(response.status_code, 200)
         assert json.loads(response.data)['redflag'][0]['message'] == "redflag deleted"
+
+
+    def test_delete_redflag_failed(self):
+        token = self.return_user_token()
+        test_data = {
+            "description": "aegrehjtr",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=test_data)
+        update_status = {"status": "rejected"}
+        self.app.patch('/api/v1/incidents/1/status', headers={"Authorization": "Bearer " + token}, json=update_status)
+        response = self.app.delete('/api/v1/incidents/1/delete', headers={"Authorization": "Bearer " + token})
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual(response.status_code, 400)
+        assert json.loads(response.data)['error'] == "Unable to delete this redflag because its already under_investigation"
 
     
     def test_delete_redflag_not_found(self):
@@ -328,8 +517,10 @@ class IncidentTest(BaseTest):
         status_update = {"status": "under_investigation"}
         response = self.app.patch('/api/v1/incidents/1/status', headers={"Authorization": "Bearer " + token}, json=status_update)
         assert response.status_code == 200
-        assert json.loads(response.data)['redflag'][0]['message'] == "status updated"    
+        assert json.loads(response.data)['redflag'][0]['message'] == "status updated"
 
+
+    
 
 
 class InterventionsTest(BaseTest):
@@ -358,11 +549,34 @@ class InterventionsTest(BaseTest):
         assert json.loads(response.data)['status'] == 201
 
 
+    def test_add_intervention_with_admin_token(self):
+        """Test add intervention with admin token"""
+        admin_token = self.return_admin_token()
+        token = self.return_user_token()
+        incident_Test = {
+            "description": "w3y45u w4u5ik 5w5i63",
+            "image": "",
+            "location": "setjyk",
+            "video": "",
+            "status": "pending"
+        }
+        response = self.app.post('/api/v1/incidents', headers={"Authorization": "Bearer " + token}, json=incident_Test)
+        test_data = {
+            "redflag_id": 1,
+            "comment": "rctyhvubinoui",
+            "inter_location": "0.5, 32.5"
+        }
+        response = self.app.post('/api/v1/interventions', 
+        headers={"Authorization": "Bearer " + admin_token}, json=test_data)
+        self.assertEqual(response.status_code, 401)
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
+
     def test_add_intervention_redflag_id_doesnot_exist(self):
         """Test with redflag_id which doesnot exist"""
         token = self.return_user_token()
         test_data = {
-            "redflag_id": 10,
+            "redflag_id": 40000,
             "comment": "rctyhvubinoui",
             "inter_location": "0.5, 32.5"
         }
@@ -417,7 +631,7 @@ class InterventionsTest(BaseTest):
         assert json.loads(response.data)['redflag'][0]['message'] == "intervention comment updated"
 
 
-    def test_edit_comment_comment_missing(self):
+    def test_edit_comment_missing(self):
         token = self.return_user_token()
         test_data = {
             "redflag_id": 1,
@@ -431,9 +645,38 @@ class InterventionsTest(BaseTest):
         headers={"Authorization": "Bearer " + token}, json=update_comment)
         assert response.status_code == 400
         assert json.loads(response.data)['error']['message'] == "comment is required"
+
+
+    def test_edit_intervention_with_admin_token(self):
+        token = self.return_admin_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}, json=test_data
+            )
+        update_comment = {"comment": "kbiuivvb"}
+        response = self.app.patch(
+            '/api/v1/interventions/1/comment',
+            headers={"Authorization": "Bearer " + token}, json=update_comment
+            )
+        assert response.status_code == 401
+
+
+    def test_edit_intervention_not_found(self):
+        token = self.return_user_token()
+        update_comment = {"comment": "kbiuivvb"}
+        response = self.app.patch(
+            '/api/v1/interventions/4000/comment',
+            headers={"Authorization": "Bearer " + token}, json=update_comment
+            )
+        assert response.status_code == 404     
    
    
-    def test_edit_comment_comment_missing_without_token(self):
+    def test_edit_comment_without_token(self):
         update_comment = {"comment": ""}
         response = self.app.patch('/api/v1/interventions/1/comment', json=update_comment)
         assert response.status_code == 401
@@ -452,6 +695,36 @@ class InterventionsTest(BaseTest):
         response = self.app.delete('/api/v1/interventions/1/2/delete', 
         headers={"Authorization": "Bearer " + token})
         assert response.status_code == 200
+
+
+    def test_delete_intervention_not_found(self):
+        token = self.return_user_token()
+        response = self.app.delete(
+            '/api/v1/interventions/5000/2/delete',
+            headers={"Authorization": "Bearer " + token}
+            )
+        assert response.status_code == 404    
+
+
+    def test_delete_intervention_with_admin_token(self):
+        token = self.return_admin_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token},
+            json=test_data
+            )
+        response = self.app.delete(
+            '/api/v1/interventions/1/2/delete', 
+            headers={"Authorization": "Bearer " + token}
+            )
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+
 
 
     def test_delete_intervention_without_token(self):
@@ -473,13 +746,70 @@ class InterventionsTest(BaseTest):
             "comment": "wevlqnwcAOP",
             "inter_location": "0.5, 32.5"
         }
-        self.app.post('/api/v1/interventions', content_type="application/json", 
-        headers={"Authorization": "Bearer " + token}, json=test_data)
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}, json=test_data
+            )
         update_location = {"inter_location": "0.5, 32.9"}
-        response = self.app.patch('/api/v1/interventions/1/inter', 
-        headers={"Authorization": "Bearer " + token}, json=update_location)
+        response = self.app.patch(
+            '/api/v1/interventions/1/inter', 
+            headers={"Authorization": "Bearer " + token}, json=update_location
+            )
         assert response.status_code == 200
         assert json.loads(response.data)['data'][0]['intervention'] == "intervention comment updated"
+
+
+    def test_change_inter_location_is_missing_field(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}, json=test_data
+            )
+        update_location = {"inter_location": ""}
+        response = self.app.patch(
+            '/api/v1/interventions/1/inter', 
+            headers={"Authorization": "Bearer " + token}, json=update_location
+            )
+        assert response.status_code == 400
+        assert json.loads(response.data)['error']['message'] == "inter_location is required"
+
+
+    def test_change_inter_location_(self):
+        token = self.return_user_token()
+        update_location = {"inter_location": "vwwvbab"}
+        response = self.app.patch(
+            '/api/v1/interventions/2000/inter', 
+            headers={"Authorization": "Bearer " + token}, json=update_location
+            )
+        assert response.status_code == 404
+        assert json.loads(response.data)['error'] == "unable to find incident or intervention"    
+
+
+    def test_change_inter_location_with_admin_token(self):
+        token = self.return_admin_token()
+        user_token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + user_token}, json=test_data
+            )
+        update_location = {"inter_location": "0.5, 32.9"}
+        response = self.app.patch(
+            '/api/v1/interventions/1/inter', 
+            headers={"Authorization": "Bearer " + token}, json=update_location
+            )
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised Access"
+    
 
 
     def test_view_all_interventions(self):
@@ -509,6 +839,24 @@ class InterventionsTest(BaseTest):
         assert json.loads(response.data)['msg'] == "Missing Authorization Header"
 
 
+    def test_view_all_interventions_with_user_token(self):
+        token = self.return_user_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+             headers={"Authorization": "Bearer " + token}, json=test_data
+             )
+        response = self.app.get(
+            '/api/v1/interventions',
+            headers={"Authorization": "Bearer " + token}
+            )
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised access"
+
     def test_view_all_user_interventions(self):
         token = self.return_user_token()
         test_data = {
@@ -526,6 +874,24 @@ class InterventionsTest(BaseTest):
         assert response.status_code == 200
 
 
+    def test_view_all_user_interventions(self):
+        token = self.return_admin_token()
+        test_data = {
+            "redflag_id": 1,
+            "comment": "wevlqnwcAOP",
+            "inter_location": "0.5, 32.5"
+        }
+        self.app.post(
+            '/api/v1/interventions', content_type="application/json",
+            headers={"Authorization": "Bearer " + token}, json=test_data
+            )
+        response = self.app.get(
+            '/api/v1/users/interventions/2', content_type="application/json",
+            headers={"Authorization": "Bearer " + token})
+        assert response.status_code == 401
+        assert json.loads(response.data)['error'] == "Unauthorised Access"    
+
+
     def test_view_all_user_interventions_without_token(self):
         test_data = {
             "redflag_id": 1,
@@ -535,6 +901,7 @@ class InterventionsTest(BaseTest):
         self.app.post('/api/v1/interventions', content_type="application/json", json=test_data)
         response = self.app.get('/api/v1/users/interventions/2')
         assert response.status_code == 401
+        assert json.loads(response.data)['msg'] == "Missing Authorization Header"
 
 
     def test_find_one_intervention(self):

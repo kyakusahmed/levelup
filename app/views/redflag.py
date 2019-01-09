@@ -4,8 +4,9 @@ from app.models.redflag import Incident
 from app.models.auth import User
 from app.views.validator import Validation
 from app import app
-from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity,jwt_optional)
+from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity)
 import os
+import smtplib
 
 user = User()
 incident = Incident()
@@ -182,9 +183,22 @@ def admin_updates_redflag_status(incident_id):
     if validate_status:
         return validate_status 
 
+    # host = "smtp.gmail.com"
+    # port = 587
+    # username = "kyakuluahmed@gmail.com"
+    # password = "CHRISTINE77"
+    # from_email = username
+    # current_user = get_jwt_identity()
+    # to_list = [current_user[4]]
+
+    # email_conn = smtplib.SMTP(host, port)
+    # email_conn.ehlo()
+    # email_conn.starttls()
+    # email_conn.login(username, password)
+    # email_conn.sendmail(from_email, to_list, "your redflag status was updated")
+    
     status_updated = incident.update_status(incident_id, input['status'])
-    list = [{"incident_id": redflag[0], "message": status_updated}]  
-    return jsonify({"status": 200, "redflag": list})
+    return jsonify({"status": 200, "redflag": [{"incident_id": redflag[0],"message": status_updated}]}), 200
 
 
 @app.route('/api/v1/incidents/<int:incident_id>/location', methods=['PATCH'])
@@ -209,5 +223,8 @@ def update_location(incident_id):
     
     input = request.get_json()
     location_updated = incident.incident_location_update(incident_id, input['location'])
-    return jsonify({"status": 200, "redflag": [{"incident_id": redflag[0], "message": location_updated}]}), 200
+    return jsonify({
+        "status": 200,
+        "redflag": [{"incident_id": redflag[0], "message": location_updated}]
+        }), 200
     

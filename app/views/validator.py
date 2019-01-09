@@ -22,7 +22,6 @@ class Validation:
         for x in input_data:
             input = request.get_json()
             message = x.strip() + ' is required'
-            input[x]
             if not input[x]:
                 return {'field': x, 'message': message}   
             elif x.strip() == 'email' and not bool(match(r"^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", input[x])):
@@ -51,12 +50,15 @@ class Validation:
             return jsonify({"status": 400, "error": "field cannot be changed because redflag is already " + status }), 400
         return None
 
-    # def location_validate(self, list):
-    #     location = 'lat,lng'
-    #     splitted_location = location.split(',')
-    #     if len(splitted_location) != 2:
-    #         print("please enter a valid location coordinates separated by come (,)")
-    #         print(len(splitted_location))
+    def location_validate(self, location):
+        input = request.get_json()
+        input['location'] = 'lat,lng'
+        splitted_location = location.split(',')
+        if splitted_location != 2:
+            return "please enter valid location coordinates separated by come (,)"
+        elif not (lat >= -90 and lat <= 90) and not (lng >= -180 and lng <= 180):
+            return 'Invalid latlng coordinates'
+    
        
             
 

@@ -8,16 +8,16 @@ class Interventions(DatabaseConnection):
         super().__init__()
 
 
-    def change_comment(self, comment, incident_id):
-        command = "UPDATE interventions SET comment = '%s' from incidents WHERE incident_id = '%s'" % (incident_id, comment)
+    def change_comment(self, comment, incident_id, inter_id):
+        command = "UPDATE interventions SET comment = '%s' from incidents WHERE incident_id = '%s' and inter_id = '%s'" % (comment, incident_id, inter_id)
         self.cursor.execute(command)
         return "intervention comment updated"
 
 
-    def update_inter_location(self, inter_location, incident_id):
-        command = "UPDATE interventions SET inter_location = '%s' from incidents WHERE incident_id = '%s'" % (incident_id, inter_location)
+    def update_inter_location(self, inter_location, incident_id, inter_id):
+        command = "UPDATE interventions SET inter_location = '%s' from incidents WHERE incident_id = '%s' and inter_id = '%s'" % (inter_location, incident_id, inter_id)
         self.cursor.execute(command)
-        return "intervention comment updated"
+        return "inter_location comment updated"
 
 
     def create_intervention(self, comment_by, redflag_id, comment, inter_location): 
@@ -48,6 +48,14 @@ class Interventions(DatabaseConnection):
     def get_intervention(self, inter_id, comment_by):
         command = """SELECT * from interventions WHERE inter_id ='{}' and comment_by = '{}'
         """.format(inter_id, comment_by)
+        self.cursor.execute(command)
+        data = self.cursor.fetchone()
+        return data 
+
+    
+    def check_intervention(self, inter_id):
+        command = """SELECT * from interventions WHERE inter_id ='{}'
+        """.format(inter_id)
         self.cursor.execute(command)
         data = self.cursor.fetchone()
         return data 

@@ -31,7 +31,7 @@ def register_user():
             return jsonify(message="role doesnt exist"), 406
         redflag = user.register_user(data["first_name"].strip(), data["last_name"].strip(),
             data["email"].strip(), data["password"].strip(), "user")
-        return jsonify({"status": 201, "data": redflag}), 201
+        return jsonify({"status": 201, "message": redflag}), 201
 
 
 @app.route('/api/v1/users/login', methods=['POST'])
@@ -39,10 +39,13 @@ def user_login():
 
     validate_credentials = validate.input_data_validation(['email', 'password'])
     if validate_credentials:
-        return jsonify({"status": 400, "error": validate_credentials}), 400
+        return jsonify({
+            "status": 400, "error": validate_credentials
+            }), 400
 
     data = request.get_json()
-    check_user= user.user_login(data['email'], data['password'])
+    check_user= user.user_login(
+        data['email'], data['password'])
     if not check_user:
         return jsonify({"status": 200, "message": "register first"}), 200 
 
@@ -55,7 +58,10 @@ def user_login():
 def update_user_to_admin(user_id):
     current_user = get_jwt_identity()
     if current_user[8] != "admin":
-        return jsonify({"message": "Unauthorised Access"}), 401
+        return jsonify({
+            "message": "Unauthorised Access"
+            }), 401
+
     get_user = user.get_user_by_user_id(user_id)
     if not get_user:
         return jsonify(message="User Not Found"), 404

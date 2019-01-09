@@ -23,6 +23,8 @@ omit =
     */tests/*
     */views/__init__.py
     */models/__init__.py
+    */models/*
+    */app/__init__.py
 
     */decimal.py
     */asyncio.py

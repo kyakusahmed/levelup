@@ -23,7 +23,9 @@ class DatabaseConnection:
             )
             self.conn.autocommit = True
             self.cursor = self.conn.cursor()
-            print("connected")
             print(self.db)
+            location = 'lat,lng'
+            splitted_location = location.split(',')
+            print(splitted_location)
         except Exception as ex:
             print("connection failed {}".format(ex))

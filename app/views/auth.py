@@ -24,13 +24,10 @@ def register_user():
     if registered:
         return jsonify({"status": 200, "message": "user registered already"}), 200
     else:
-        get_input = request.get_json()
-        role = get_input.get('role')
-        roles = ["user","admin"]
-        if not role in roles:
-            return jsonify(message="role doesnt exist"), 406
-        redflag = user.register_user(data["first_name"].strip(), data["last_name"].strip(),
-            data["email"].strip(), data["password"].strip(), "user")
+        redflag = user.register_user(
+            data["first_name"].strip(), data["last_name"].strip(),
+            data["email"].strip(), data["password"].strip()
+            )
         return jsonify({"status": 201, "message": redflag}), 201
 
 

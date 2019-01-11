@@ -2,6 +2,7 @@ from app.models.db_conn import DatabaseConnection
 from datetime import datetime
 import psycopg2
 from psycopg2.extensions import AsIs
+from psycopg2.extras import RealDictCursor
 class Incident(DatabaseConnection):
 
     def __init__(self):
@@ -34,12 +35,12 @@ class Incident(DatabaseConnection):
 
 
     def get_all_incidents_by_specific_user(self, createdby):
-        command = """SELECT * FROM incidents WHERE createdby = '{}'
+        command = """SELECT * FROM incidents WHERE user_id = '{}'
         """.format(createdby)
         self.cursor.execute(command)
         incidents = self.cursor.fetchall()
-        return incidents  
-
+        return incidents
+        
 
     def get_all_incidents(self):
         command = """SELECT * FROM incidents 
@@ -49,10 +50,10 @@ class Incident(DatabaseConnection):
         return results
 
 
-    def add_redflag(self, createdby, description, location, image, video):
-        command = """INSERT INTO incidents (createdby, description, comment_type, location, image, video, status, createdon) 
-        VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')
-        """.format(createdby, description,"redflag", location, image, video, "pending", datetime.now())
+    def add_redflag(self, createdby, description, location, fromMyCamera):
+        command = """INSERT INTO incidents (user_id, description, comment_type, location, fromMyCamera, status, createdon) 
+        VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')
+        """.format(createdby, description, "redflag", location, fromMyCamera, "pending", datetime.now())
         self.cursor.execute(command)
         return "redflag added successfully"
     

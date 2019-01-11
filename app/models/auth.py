@@ -7,10 +7,10 @@ class User(DatabaseConnection):
     def __init__(self):
         super().__init__()
 
-    def register_user(self, first_name, last_name, email, password, role):
+    def register_user(self, first_name, last_name, email, password):
         command = """
         INSERT INTO USERS (first_name, last_name, email, password, role, createdon) VALUES('{}','{}','{}','{}','{}','{}')
-        """.format(first_name, last_name, email, password, role, datetime.now())
+        """.format(first_name, last_name, email, password, "user", datetime.now())
         self.cursor.execute(command)
         return "user registered successfully"
     

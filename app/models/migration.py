@@ -1,6 +1,7 @@
 from app.models.db_conn import DatabaseConnection
 import psycopg2
 
+
 class Migration(DatabaseConnection):
     
     def __init__(self):
@@ -26,7 +27,7 @@ class Migration(DatabaseConnection):
         """ create tables in the PostgreSQL database"""
         commands = (
         """ CREATE TABLE IF NOT EXISTS USERS (
-            USER_ID SERIAL PRIMARY KEY UNIQUE,
+            ID SERIAL PRIMARY KEY UNIQUE,
             FIRST_NAME VARCHAR(50) NOT NULL,
             LAST_NAME VARCHAR(50) NOT NULL,
             OTHER_NAMES VARCHAR(50),
@@ -40,13 +41,12 @@ class Migration(DatabaseConnection):
         """,
         """ CREATE TABLE IF NOT EXISTS INCIDENTS (
             INCIDENT_ID  SERIAL PRIMARY KEY UNIQUE,
-            createdBy INTEGER,
-            FOREIGN KEY(createdBy) REFERENCES USERS(USER_ID),
+            USER_ID INTEGER,
+            FOREIGN KEY(USER_ID) REFERENCES USERS(ID),
             DESCRIPTION VARCHAR(50) NOT NULL,
             COMMENT_TYPE VARCHAR(25) NOT NULL,
             location VARCHAR(50) NOT NULL,
-            image VARCHAR(50),
-            video VARCHAR(50),
+            fromMyCamera VARCHAR(50),
             status VARCHAR(50) NOT NULL,
             createdOn timestamp(6) without time zone
             )
@@ -54,7 +54,7 @@ class Migration(DatabaseConnection):
         """ CREATE TABLE IF NOT EXISTS INTERVENTIONS (
             INTER_ID  SERIAL PRIMARY KEY UNIQUE,
             COMMENT_BY INTEGER,
-            FOREIGN KEY(COMMENT_BY) REFERENCES USERS(USER_ID),
+            FOREIGN KEY(COMMENT_BY) REFERENCES USERS(ID),
             REDFLAG_ID INTEGER,
             FOREIGN KEY(REDFLAG_ID) REFERENCES INCIDENTS(INCIDENT_ID),
             COMMENT VARCHAR(50) NOT NULL,

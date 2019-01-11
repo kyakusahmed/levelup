@@ -36,8 +36,7 @@ def add_incidet():
         current_user[0], 
         input['description'], 
         input['location'], 
-        input['image'], 
-        input['video']
+        input['fromMyCamera']
         ) 
     return jsonify({"status": 201, "message": incid}), 201
 
@@ -59,16 +58,16 @@ def get_specific_redflag(incident_id):
         'comment':redflag[2],
         'comment_type':redflag[3],
         'location':redflag[4],
-        'image':redflag[5],
-        'video':redflag[6],
-        'status':redflag[7],
-        'createdon':redflag[8]
+        'fromMyCamera':redflag[5],
+        'status':redflag[6],
+        'createdon':redflag[7]
     }}), 200
+
 
 
 @app.route('/api/v1/incidents', methods=['GET']) 
 @jwt_required
-def get_all_redflag( ):
+def get_all_redflags( ):
     """get all redflags"""
     current_user = get_jwt_identity()
     if current_user[8] == "user":
@@ -77,18 +76,13 @@ def get_all_redflag( ):
     red_flag = incident.get_all_incidents() 
     incident_list = []
     for key in range(len(red_flag)):
-        incident_list.append({
-            'incident_id': red_flag[key][0],
-            'createdby':red_flag[key][1],
-            'comment':red_flag[key][2],
-            'comment_type':red_flag[key][3],
-            'location':red_flag[key][4],
-            'image':red_flag[key][5],
-            'video':red_flag[key][6],
-            'status':red_flag[key][7],
-            'createdon':red_flag[key][8]
+        incident_list.append({'incident_id': red_flag[key][0], 'createdby':red_flag[key][1],
+            'comment':red_flag[key][2], 'comment_type':red_flag[key][3], 'location':red_flag[key][4],
+            'fromMyCamera':red_flag[key][5], 'status':red_flag[key][6], 'createdon':red_flag[key][7]
         })
     return jsonify({"status": 200, "redflagss": incident_list}), 200 
+
+
 
 
 @app.route('/api/v1/users/incidents/<int:createdby>', methods=['GET']) 
@@ -110,12 +104,14 @@ def get_all_user_redflags(createdby):
                 'comment':red_flag[key][2],
                 'comment_type':red_flag[key][3],
                 'location':red_flag[key][4],
-                'image':red_flag[key][5],
-                'video':red_flag[key][6],
-                'status':red_flag[key][7],
-                'createdon':red_flag[key][8]
+                'fromMyCamera':red_flag[key][5],
+                'status':red_flag[key][6],
+                'createdon':red_flag[key][7]
             })
         return jsonify({"status": 200, "redflagss": incident_list}), 200 
+
+
+
 
 @app.route('/api/v1/incidents/<int:incident_id>/desc', methods=['PATCH'])
 @jwt_required 
@@ -146,10 +142,6 @@ def edit_description(incident_id):
 @jwt_required 
 def delete_redflag(incident_id):
     """enables user to delete a specific redflag"""
-    current_user = get_jwt_identity()
-    if current_user[8] == "admin":
-        return jsonify({"error": "Unauthorised Access"}), 401
-
     redflag = incident.find_incident(incident_id)
     if not redflag:
         return jsonify({"status": 404, "error": "unable to find redflag"}), 404    
@@ -181,21 +173,7 @@ def admin_updates_redflag_status(incident_id):
 
     validate_status = validate.validate_status(redflag[7])
     if validate_status:
-        return validate_status 
-
-    # host = "smtp.gmail.com"
-    # port = 587
-    # username = "kyakuluahmed@gmail.com"
-    # password = "CHRISTINE77"
-    # from_email = username
-    # current_user = get_jwt_identity()
-    # to_list = [current_user[4]]
-
-    # email_conn = smtplib.SMTP(host, port)
-    # email_conn.ehlo()
-    # email_conn.starttls()
-    # email_conn.login(username, password)
-    # email_conn.sendmail(from_email, to_list, "your redflag status was updated")
+        return validate_status
     
     status_updated = incident.update_status(incident_id, input['status'])
     return jsonify({"status": 200, "redflag": [{"incident_id": redflag[0],"message": status_updated}]}), 200

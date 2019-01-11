@@ -47,17 +47,19 @@ class Validation:
 
     def validate_status(self, status):
         if status in ['rejected', 'resolved']:
-            return jsonify({"status": 400, "error": "field cannot be changed because redflag is already " + status }), 400
+            return jsonify({
+                "status": 400, "error": "field cannot be changed because redflag is already " + status }), 400
         return None
 
-    def location_validate(self, location):
-        input = request.get_json()
-        input['location'] = 'lat,lng'
-        splitted_location = location.split(',')
-        if splitted_location != 2:
-            return "please enter valid location coordinates separated by come (,)"
-        elif not (lat >= -90 and lat <= 90) and not (lng >= -180 and lng <= 180):
-            return 'Invalid latlng coordinates'
+        
+    # def location_validate(self, location):
+    #     input = request.get_json()
+    #     input['location'] = 'lat,lng'
+    #     splitted_location = location.split(',')
+    #     if splitted_location != 2:
+    #         return "please enter valid location coordinates separated by come (,)"
+    #     elif not (lat >= -90 and lat <= 90) and not (lng >= -180 and lng <= 180):
+    #         return 'Invalid latlng coordinates'
     
        
             

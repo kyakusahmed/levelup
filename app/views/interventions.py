@@ -61,10 +61,6 @@ def delete_intervention(inter_id, comment_by):
 @jwt_required 
 def edit_intervention(incident_id, inter_id):
     """enables a user to edit an intervention"""
-    current_user = get_jwt_identity()
-    if current_user[8] == "admin":
-        return jsonify({"error": "Unauthorised Access"}), 401
-
     input = request.get_json()
     validate_inputs = validate.input_data_validation(['comment'])
     if validate_inputs:
@@ -93,10 +89,6 @@ def edit_intervention(incident_id, inter_id):
 @jwt_required 
 def change_inter_location(incident_id, inter_id):
     """enables a user to change intervention coordinates"""
-    current_user = get_jwt_identity()
-    if current_user[8] == "admin":
-        return jsonify({"error": "Unauthorised Access"}), 401
-
     input = request.get_json()
     validate_inputs = validate.input_data_validation(['inter_location'])
     if validate_inputs:
@@ -150,26 +142,22 @@ def view_all_interventions( ):
 @jwt_required 
 def view_all_user_interventions(comment_by):
     """get all user's redflags/interventions"""
-    current_user = get_jwt_identity()
-    if current_user[8] == "admin":
-        return jsonify({"error": "Unauthorised Access"}), 401
-    else:
-        interventions = interven.view_all_interventions_by_specific_user(comment_by)
-        if not interventions:
-            return jsonify({"status": 404, "error": "unable to find any intervention by you"}), 404 
-        else:   
-            new_list = []
-            for key in range(len(interventions)):
-                new_list.append({
-                    'inter_id':interventions[key][0],
-                    'comment_by':interventions[key][1], 
-                    'redflag_id':interventions[key][2], 
-                    'comment':interventions[key][3], 
-                    'comment_type':interventions[key][4], 
-                    'inter_location':interventions[key][5], 
-                    'createdon':interventions[key][6]
-                })
-            return jsonify({"status": 200, "Interventions": new_list}), 200
+    interventions = interven.view_all_interventions_by_specific_user(comment_by)
+    if not interventions:
+        return jsonify({"status": 404, "error": "unable to find any intervention by you"}), 404 
+    else:   
+        new_list = []
+        for key in range(len(interventions)):
+            new_list.append({
+                'inter_id':interventions[key][0],
+                'comment_by':interventions[key][1], 
+                'redflag_id':interventions[key][2], 
+                'comment':interventions[key][3], 
+                'comment_type':interventions[key][4], 
+                'inter_location':interventions[key][5], 
+                'createdon':interventions[key][6]
+            })
+        return jsonify({"status": 200, "Interventions": new_list}), 200
 
 
 @app.route('/api/v1/interventions/<int:inter_id>/<int:comment_by>', methods=['GET']) 

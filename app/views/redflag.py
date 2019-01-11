@@ -92,23 +92,23 @@ def get_all_user_redflags(createdby):
     current_user = get_jwt_identity()
     if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised access"}), 401
-    else:
-        red_flag = incident.get_all_incidents_by_specific_user(createdby)
-        if not red_flag:
-            return jsonify({"status": 404, "error": "unable to find any incident created by you"}), 404
-        incident_list = []
-        for key in range(len(red_flag)):
-            incident_list.append({
-                'incident_id': red_flag[key][0],
-                'createdby':red_flag[key][1],
-                'comment':red_flag[key][2],
-                'comment_type':red_flag[key][3],
-                'location':red_flag[key][4],
-                'fromMyCamera':red_flag[key][5],
-                'status':red_flag[key][6],
-                'createdon':red_flag[key][7]
-            })
-        return jsonify({"status": 200, "redflagss": incident_list}), 200 
+
+    red_flag = incident.get_all_incidents_by_specific_user(createdby)
+    if not red_flag:
+        return jsonify({"status": 404, "error": "unable to find any incident created by you"}), 404
+    incident_list = []
+    for key in range(len(red_flag)):
+        incident_list.append({
+            'incident_id': red_flag[key][0],
+            'createdby':red_flag[key][1],
+            'comment':red_flag[key][2],
+            'comment_type':red_flag[key][3],
+            'location':red_flag[key][4],
+            'fromMyCamera':red_flag[key][5],
+            'status':red_flag[key][6],
+            'createdon':red_flag[key][7]
+        })
+    return jsonify({"status": 200, "redflagss": incident_list}), 200 
 
 
 

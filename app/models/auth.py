@@ -33,16 +33,16 @@ class User(DatabaseConnection):
         return user 
 
 
-    def get_user_by_user_id(self, user_id):
-        command = """SELECT * FROM users WHERE user_id ='{}'
-        """.format(user_id)
+    def get_user_by_user_id(self, id):
+        command = """SELECT * FROM users WHERE id ='{}'
+        """.format(id)
         self.cursor.execute(command)
         user = self.cursor.fetchone()
         return user
 
 
-    def give_admin_rights_to_user(self, user_id, role):
-        command = "UPDATE users SET role = '%s' WHERE user_id = '%s'" % (role, user_id)
+    def give_admin_rights_to_user(self, id, role):
+        command = "UPDATE users SET role = '%s' WHERE id = '%s'" % (role, id)
         self.cursor.execute(command)
         return "user is successfully given admin rights"
            

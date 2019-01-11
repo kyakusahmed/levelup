@@ -92,7 +92,7 @@ def get_all_user_redflags(createdby):
     current_user = get_jwt_identity()
     if current_user[8] == "admin":
         return jsonify({"error": "Unauthorised access"}), 401
-
+        
     red_flag = incident.get_all_incidents_by_specific_user(createdby)
     if not red_flag:
         return jsonify({"status": 404, "error": "unable to find any incident created by you"}), 404

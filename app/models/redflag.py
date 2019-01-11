@@ -3,6 +3,8 @@ from datetime import datetime
 import psycopg2
 from psycopg2.extensions import AsIs
 from psycopg2.extras import RealDictCursor
+
+
 class Incident(DatabaseConnection):
 
     def __init__(self):
@@ -61,8 +63,4 @@ class Incident(DatabaseConnection):
     def update_description(self, description, incident_id):
         command = "UPDATE incidents SET description = '%s' WHERE incident_id = '%s'" % (incident_id, description)
         self.cursor.execute(command)
-        return "description updated"     
-
-
-   
-   
+        return "description updated"

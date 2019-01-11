@@ -50,16 +50,16 @@ def user_login():
     return jsonify({'message':"Login successful", 'access_token':access_token}), 200
 
 
-@app.route('/api/v1/users/<int:user_id>', methods=['PUT'])
+@app.route('/api/v1/users/<int:id>', methods=['PUT'])
 @jwt_required
-def update_user_to_admin(user_id):
+def update_user_to_admin(id):
     current_user = get_jwt_identity()
     if current_user[8] != "admin":
         return jsonify({
             "message": "Unauthorised Access"
             }), 401
 
-    get_user = user.get_user_by_user_id(user_id)
+    get_user = user.get_user_by_user_id(id)
     if not get_user:
         return jsonify(message="User Not Found"), 404
 
@@ -68,7 +68,7 @@ def update_user_to_admin(user_id):
     roles = ["user","admin"]
     if not role in roles:
         return jsonify(message="role doesnt exist"), 406
-        
+
     user.give_admin_rights_to_user(get_user[0], get_input['role'])
     return jsonify(message = "User is successfully given admin rights"), 200        
 

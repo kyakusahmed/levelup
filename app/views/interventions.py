@@ -69,20 +69,20 @@ def edit_intervention(incident_id, inter_id):
     find_incident = interven.get_incident(incident_id)
     if not find_incident:
         return jsonify({"status": 404, "error": "unable to find incident"}), 404
-    else:
-        check_intervention = interven.check_intervention(inter_id)
-        if not check_intervention:
-            return jsonify({"status": 404, "error": "unable to find intervention"}), 404
+        
+    check_intervention = interven.check_intervention(inter_id)
+    if not check_intervention:
+        return jsonify({"status": 404, "error": "unable to find intervention"}), 404
         
     validate_status = validate.validate_status(find_incident[7])
     if validate_status:
         return validate_status
-    else:
-        Incid = interven.change_comment(input["comment"], incident_id, inter_id)
-        return jsonify({
-            "status": 200, "redflag" : [{"incident_id": incident_id,
-            "inter_id": inter_id, "message": Incid}]
-            }), 200
+
+    Incid = interven.change_comment(input["comment"], incident_id, inter_id)
+    return jsonify({
+        "status": 200, "redflag" : [{"incident_id": incident_id,
+        "inter_id": inter_id, "message": Incid}]
+        }), 200
 
 
 @app.route('/api/v1/interventions/<int:inter_id>/<int:incident_id>/inter', methods=['PATCH'])
@@ -97,7 +97,7 @@ def change_inter_location(incident_id, inter_id):
     redflag = interven.get_incident(incident_id)
     if not redflag:
         return jsonify({"status": 404, "error": "unable to find incident"}), 404
-        
+
     check_intervention = interven.check_intervention(inter_id)
     if not check_intervention:
         return jsonify({"status": 404, "error": "unable to find intervention"}), 404

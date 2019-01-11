@@ -62,14 +62,14 @@ def update_user_to_admin(user_id):
     get_user = user.get_user_by_user_id(user_id)
     if not get_user:
         return jsonify(message="User Not Found"), 404
-    else:
-        get_input = request.get_json()
-        role = get_input.get('role')
-        roles = ["user","admin"]
-        if not role in roles:
-            return jsonify(message="role doesnt exist"), 406
-        else:
-            user.give_admin_rights_to_user(get_user[0], get_input['role'])
-            return jsonify(message = "User is successfully given admin rights"), 200        
- 
+
+    get_input = request.get_json()
+    role = get_input.get('role')
+    roles = ["user","admin"]
+    if not role in roles:
+        return jsonify(message="role doesnt exist"), 406
+        
+    user.give_admin_rights_to_user(get_user[0], get_input['role'])
+    return jsonify(message = "User is successfully given admin rights"), 200        
+
 

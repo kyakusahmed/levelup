@@ -97,22 +97,22 @@ def change_inter_location(incident_id, inter_id):
     redflag = interven.get_incident(incident_id)
     if not redflag:
         return jsonify({"status": 404, "error": "unable to find incident"}), 404
-    else:
-        check_intervention = interven.check_intervention(inter_id)
-        if not check_intervention:
-            return jsonify({"status": 404, "error": "unable to find intervention"}), 404
+        
+    check_intervention = interven.check_intervention(inter_id)
+    if not check_intervention:
+        return jsonify({"status": 404, "error": "unable to find intervention"}), 404
 
     validate_status = validate.validate_status(redflag[7])
     if validate_status:
         return validate_status
-    else:
-        Incid = interven.update_inter_location(
-            input["inter_location"], redflag[0], inter_id
-            )
-        return jsonify({
-            "status": 200, "data" : [{"incident_id": incident_id,
-            "inter_id": inter_id, "intervention": Incid}]
-            }), 200
+
+    Incid = interven.update_inter_location(
+        input["inter_location"], redflag[0], inter_id
+        )
+    return jsonify({
+        "status": 200, "data" : [{"incident_id": incident_id,
+        "inter_id": inter_id, "intervention": Incid}]
+        }), 200
 
 
 @app.route('/api/v1/interventions', methods=['GET']) 

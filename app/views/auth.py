@@ -5,6 +5,7 @@ from app.views.validator import Validation
 from app import app
 from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity,jwt_optional)
 import os
+from flasgger import swag_from
 
 
 user = User()
@@ -14,6 +15,7 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'
 
 
 @app.route('/api/v1/users/register', methods=['POST'])
+@swag_from('../docs/register.yml')
 def register_user():
     data = request.get_json()    
     val_input_data = validate.input_data_validation(['first_name', 'last_name', 'email', 'password'])
@@ -32,6 +34,7 @@ def register_user():
 
 
 @app.route('/api/v1/users/login', methods=['POST'])
+@swag_from('../docs/login.yml')
 def user_login():
 
     validate_credentials = validate.input_data_validation(['email', 'password'])

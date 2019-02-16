@@ -1,0 +1,31 @@
+admin get all Redflags
+---
+tags:
+  - admin get all Redflags
+  
+parameters:
+  
+  - in: header
+    name: Authorization
+    description: authorization header
+    required: true
+    type: string
+    schema:
+    id: bearer
+
+responses:
+  200:
+    description: Redflags retrieved successfully
+   
+  401:
+    description: Unauthorization error
+
+security:
+  - JWT:
+      description: Provide JWT token
+      type: apikey
+      schema: bearer
+      name: Authorization
+      in: header
+      template: "Bearer {apikey}"
+      bearerFormat: JWT

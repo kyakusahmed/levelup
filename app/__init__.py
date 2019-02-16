@@ -1,7 +1,10 @@
 from flask import Flask
+from flasgger import Swagger
 from re import match
 
 app = Flask("__name__")
+
+swagger = Swagger(app)
 
 
 from app.models import db_conn

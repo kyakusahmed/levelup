@@ -33,7 +33,8 @@ class Validation:
             elif x.strip() == 'status' and input[x].strip() not in ['draft', 'resolved', 'under_investigation', 'rejected']:
                 message = 'status doesnot exist, please use draft, resolved, rejected or under investigation'
                 return message
-            
+            elif x.strip() == 'location' and not match(r"^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$", input[x]):    
+                return 'invalid cordinates'
                
     def validate_status_delete(self, status):
         if status in ['rejected', 'resolved', 'under_investigation']:
@@ -43,25 +44,10 @@ class Validation:
     def validate_status_location(self, status):
         if status in ['rejected', 'resolved', 'under_investigation']:
             return jsonify({"status": 400, "error": "location cannot be changed because redflag its already " + status }), 400
-        return None    
+        return None  
 
     def validate_status(self, status):
         if status in ['rejected', 'resolved']:
             return jsonify({
                 "status": 400, "error": "field cannot be changed because redflag is already " + status }), 400
         return None
-
-        
-    # def location_validate(self, location):
-    #     input = request.get_json()
-    #     input['location'] = 'lat,lng'
-    #     splitted_location = location.split(',')
-    #     if splitted_location != 2:
-    #         return "please enter valid location coordinates separated by come (,)"
-    #     elif not (lat >= -90 and lat <= 90) and not (lng >= -180 and lng <= 180):
-    #         return 'Invalid latlng coordinates'
-    
-       
-            
-
-                      

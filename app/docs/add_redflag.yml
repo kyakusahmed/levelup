@@ -1,0 +1,38 @@
+Add Redflags
+---
+tags:
+  - Add Redflags
+parameters:
+  - name: Authorization
+    in: header
+    type: string
+    description: JWT token authorization
+    required: true
+    example: "Bearer "
+  - in: body
+    name: body
+    type: object
+    description: This endpoint is for users to add redflags and they have to provide description, location and fromMyCamera.
+
+    schema:
+      required:
+        - description
+        - location
+        - fromMyCamera
+      type: object
+      properties:
+        description:
+          type: string
+          example: "corruption at nkozi"
+        location:
+          type: string
+          example: "0.5,32.1"
+        fromMyCamera:
+          type: string 
+          example: "lpg.png" 
+responses:
+  200:
+    description: ok
+
+  400:
+    description: validation errors forexample empty fields 

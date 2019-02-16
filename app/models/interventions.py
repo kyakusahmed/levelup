@@ -14,17 +14,17 @@ class Interventions(DatabaseConnection):
         return "intervention comment updated"
 
 
-    def update_inter_location(self, inter_location, incident_id, inter_id):
-        command = "UPDATE interventions SET inter_location = '%s' from incidents WHERE incident_id = '%s' and inter_id = '%s'" % (inter_location, incident_id, inter_id)
+    def update_inter_location(self, location, incident_id, inter_id):
+        command = "UPDATE interventions SET location = '%s' from incidents WHERE incident_id = '%s' and inter_id = '%s'" % (location, incident_id, inter_id)
         self.cursor.execute(command)
-        return "inter_location comment updated"
+        return "intervention location comment updated"
 
 
-    def create_intervention(self, comment_by, redflag_id, comment, inter_location): 
+    def create_intervention(self, comment_by, redflag_id, comment, location): 
         try:
-            command = """INSERT INTO interventions (comment_by, redflag_id, comment, comment_type, inter_location, createdon) 
+            command = """INSERT INTO interventions (comment_by, redflag_id, comment, comment_type, location, createdon) 
             VALUES('{}', '{}', '{}', '{}', '{}', '{}')
-            """.format(comment_by, redflag_id, comment, "intervention", inter_location, datetime.now())
+            """.format(comment_by, redflag_id, comment, "intervention", location, datetime.now())
             self.cursor.execute(command)
             return "intervention added successfully"
         except psycopg2.IntegrityError:

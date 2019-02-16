@@ -1,6 +1,7 @@
 [report]
 
 omit =
+    */lib/*
     */app.py
     */.vscode/*
     */certifi/*

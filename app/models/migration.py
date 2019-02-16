@@ -31,7 +31,7 @@ class Migration(DatabaseConnection):
             FIRST_NAME VARCHAR(50) NOT NULL,
             LAST_NAME VARCHAR(50) NOT NULL,
             OTHER_NAMES VARCHAR(50),
-            EMAIL VARCHAR(50) UNIQUE,
+            EMAIL VARCHAR(50) not null UNIQUE,
             PASSWORD VARCHAR(50) NOT NULL,
             PHONE_NUMBER VARCHAR(50),
             USERNAME VARCHAR(50), 
@@ -59,7 +59,7 @@ class Migration(DatabaseConnection):
             FOREIGN KEY(REDFLAG_ID) REFERENCES INCIDENTS(INCIDENT_ID),
             COMMENT VARCHAR(50) NOT NULL,
             COMMENT_TYPE VARCHAR(50) NOT NULL,
-            INTER_LOCATION VARCHAR(50) NOT NULL,
+            LOCATION VARCHAR(50) NOT NULL,
             createdOn timestamp(6) without time zone
             )
         """,    

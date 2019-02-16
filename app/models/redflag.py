@@ -1,9 +1,6 @@
 from app.models.db_conn import DatabaseConnection
 from datetime import datetime
 import psycopg2
-from psycopg2.extensions import AsIs
-from psycopg2.extras import RealDictCursor
-
 
 class Incident(DatabaseConnection):
 
@@ -42,6 +39,14 @@ class Incident(DatabaseConnection):
         self.cursor.execute(command)
         incidents = self.cursor.fetchall()
         return incidents
+        
+
+    def get_user_by_id(self, id):
+        command = """SELECT * FROM users WHERE id = '{}'; 
+        """.format(id)
+        self.cursor.execute(command)
+        user = self.cursor.fetchone()
+        return user
         
 
     def get_all_incidents(self):
